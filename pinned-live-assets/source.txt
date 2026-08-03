@@ -1,0 +1,4 @@
+origin=https://church-care-hub.vercel.app
+javascript=/assets/index-BGnEISna.js
+stylesheet=/assets/index-C3r3iQwS.css
+captured_at=2026-08-03T13:53:32Z
