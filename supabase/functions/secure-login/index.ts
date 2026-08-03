@@ -19,25 +19,35 @@ interface LimitState {
   retry_after_seconds?: number;
 }
 
-function readNamedKey(jsonValue: string | undefined): string | undefined {
-  if (!jsonValue) return undefined;
+function readNamedKeys(jsonValue: string | undefined): string[] {
+  if (!jsonValue) return [];
   try {
-    const keys = JSON.parse(jsonValue) as Record<string, string>;
-    return keys.default || Object.values(keys)[0];
+    const parsed = JSON.parse(jsonValue) as unknown;
+    if (typeof parsed === 'string') return [parsed];
+    if (Array.isArray(parsed)) {
+      return parsed.filter((value): value is string => typeof value === 'string');
+    }
+    if (parsed && typeof parsed === 'object') {
+      return Object.values(parsed as Record<string, unknown>)
+        .filter((value): value is string => typeof value === 'string');
+    }
   } catch {
-    return undefined;
+    // Some runtimes expose a single key instead of the JSON key map.
+    return [jsonValue];
   }
+  return [];
 }
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-const publishableKey = readNamedKey(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS'))
-  || Deno.env.get('SUPABASE_ANON_KEY')
-  || '';
+const publicKeys = new Set([
+  ...readNamedKeys(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')),
+  Deno.env.get('SUPABASE_ANON_KEY') || '',
+].filter(Boolean));
 const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-  || readNamedKey(Deno.env.get('SUPABASE_SECRET_KEYS'))
+  || readNamedKeys(Deno.env.get('SUPABASE_SECRET_KEYS'))[0]
   || '';
 
-if (!supabaseUrl || !publishableKey || !serviceKey) {
+if (!supabaseUrl || publicKeys.size === 0 || !serviceKey) {
   throw new Error('Secure login is missing required Supabase environment variables.');
 }
 
@@ -142,7 +152,8 @@ Deno.serve(async (req: Request) => {
     return json(origin, 403, { error: 'Request origin is not allowed.' });
   }
 
-  if (req.headers.get('apikey') !== publishableKey) {
+  const requestPublicKey = req.headers.get('apikey') || '';
+  if (!requestPublicKey || !publicKeys.has(requestPublicKey)) {
     return json(origin, 403, { error: 'Request could not be authorized.' });
   }
 
@@ -195,7 +206,7 @@ Deno.serve(async (req: Request) => {
     authResponse = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
       method: 'POST',
       headers: {
-        apikey: publishableKey,
+        apikey: requestPublicKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email, password }),
