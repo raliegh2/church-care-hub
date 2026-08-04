@@ -63,9 +63,7 @@ export function AuthPage() {
       setIsError(true);
       if (error instanceof SecureLoginError) {
         setMessage(error.message);
-        if (error.retryAfterSeconds > 0) {
-          setCooldownSeconds(error.retryAfterSeconds);
-        }
+        if (error.retryAfterSeconds > 0) setCooldownSeconds(error.retryAfterSeconds);
       } else {
         setMessage('Sign-in is temporarily unavailable. Please try again.');
       }
@@ -96,7 +94,6 @@ export function AuthPage() {
       return;
     }
 
-    // Deliberately return the same message whether or not the address exists.
     setMessage('If an account exists for that email, a password-reset link is on its way.');
   }
 
@@ -109,5 +106,92 @@ export function AuthPage() {
         ? 'Create account'
         : 'Sign in';
 
-  return <main className="auth-layout"><section className="auth-panel"><div className="auth-card"><Brand/><h1>{signup ? 'Create your account' : 'Welcome back'}</h1><p>{signup ? 'Join your church care team.' : 'Sign in to your role-based workspace.'}</p>{message && <div className={`notice${isError ? ' error' : ''}`}>{message}</div>}<form onSubmit={submit}>{signup && <label>Full name<input name="name" autoComplete="name" required/></label>}<label>Email<input name="email" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required/></label><label>Password<input name="password" type="password" minLength={signup ? 8 : 6} autoComplete={signup ? 'new-password' : 'current-password'} required/>{signup && <small>8+ characters with uppercase, lowercase, number, and symbol.</small>}</label><button className="primary" disabled={locked}>{submitLabel}</button></form>{!signup && <button className="text-btn" disabled={locked} onClick={() => void sendReset()}>Forgot password?</button>}<button className="text-btn" disabled={busy} onClick={() => { setSignup(!signup); setMessage(''); setIsError(false); setCooldownSeconds(0); }}>{signup ? 'Already have an account? Sign in' : 'Need an account? Sign up'}</button></div></section><section className="auth-visual"><div><h2>Welcome every person.<br/>Track every follow-up.<br/>Support every need.</h2><p>Secure ministry care for ushers, pastors and administrators.</p></div></section></main>;
+  return (
+    <main className="auth-layout">
+      <section className="auth-visual">
+        <div className="auth-visual-content">
+          <Brand subtitle="Care Ministry" />
+          <div className="auth-kicker">Care, coordinated</div>
+          <h2>Every person seen.<br />Every need followed.</h2>
+          <p>A secure workspace for ushers, pastors and administrators to care for visitors and members with clarity.</p>
+          <blockquote>
+            <strong>“Bear one another’s burdens.”</strong>
+            <span>Galatians 6:2</span>
+          </blockquote>
+        </div>
+      </section>
+
+      <section className="auth-panel">
+        <div className="auth-card">
+          <div className="auth-card-header">
+            <div className="auth-mobile-brand"><Brand subtitle="Care Ministry" /></div>
+            <h1>{signup ? 'Create your account' : 'Welcome back'}</h1>
+            <p>{signup ? 'Create an account, then choose the ministry role you serve in.' : 'Sign in to continue caring for your church community.'}</p>
+          </div>
+
+          {message && <div className={`notice${isError ? ' error' : ''}`}>{message}</div>}
+
+          <form onSubmit={submit}>
+            {signup && (
+              <label>
+                Full name
+                <input name="name" autoComplete="name" placeholder="Your full name" required />
+              </label>
+            )}
+            <label>
+              Email address
+              <input
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="name@example.com"
+                value={email}
+                onChange={event => setEmail(event.target.value)}
+                required
+              />
+            </label>
+            <label>
+              Password
+              <input
+                name="password"
+                type="password"
+                minLength={signup ? 8 : 6}
+                autoComplete={signup ? 'new-password' : 'current-password'}
+                placeholder={signup ? 'Create a secure password' : 'Enter your password'}
+                required
+              />
+              {signup && <small>8+ characters with uppercase, lowercase, number and symbol.</small>}
+            </label>
+
+            {!signup && (
+              <div className="auth-inline-action">
+                <span>Secure ministry access</span>
+                <button className="text-btn" type="button" disabled={locked} onClick={() => void sendReset()}>
+                  Forgot password?
+                </button>
+              </div>
+            )}
+
+            <button className="primary auth-submit" disabled={locked}>{submitLabel}</button>
+          </form>
+
+          <div className="auth-switch">
+            <span>{signup ? 'Already have an account?' : 'New here?'}</span>
+            <button
+              className="text-btn"
+              disabled={busy}
+              onClick={() => {
+                setSignup(!signup);
+                setMessage('');
+                setIsError(false);
+                setCooldownSeconds(0);
+              }}
+            >
+              {signup ? 'Sign in' : 'Create an account and choose your role'}
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
 }
