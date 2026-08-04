@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Brand } from '../components/Brand';
 import { supabase } from '../lib/supabase';
+import { clearLoginThrottleAfterReset } from '../lib/secureAuth';
 
 export function ResetPasswordPage({onDone}:{onDone:()=>void}){
   const [message,setMessage]=useState('');
@@ -24,9 +25,16 @@ export function ResetPasswordPage({onDone}:{onDone:()=>void}){
 
     setBusy(true);
     const {error}=await supabase.auth.updateUser({password});
+    if(error){
+      setBusy(false);
+      setMessage(error.message);
+      return;
+    }
+    // Clear any login throttle left over from the failed sign-ins that led to
+    // this reset, so the new password works right away.
+    await clearLoginThrottleAfterReset();
     setBusy(false);
-    if(error)setMessage(error.message);
-    else onDone();
+    onDone();
   }
 
   return <main className="center-screen"><section className="onboarding-card"><Brand/><h1>Choose a new password</h1><p>Enter a new password for your Church Care Hub account.</p>{message&&<div className="notice error">{message}</div>}<form onSubmit={submit}><label>New password<input name="password" type="password" minLength={8} autoComplete="new-password" required/><small>8+ characters with uppercase, lowercase, number, and symbol.</small></label><label>Confirm new password<input name="confirmation" type="password" minLength={8} autoComplete="new-password" required/></label><button className="primary" disabled={busy}>{busy?'Saving…':'Update password'}</button></form></section></main>
