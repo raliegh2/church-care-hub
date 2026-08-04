@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from 'react';
 import {
-  BarChart3,
   ClipboardCheck,
   ContactRound,
   FileUp,
@@ -15,6 +14,7 @@ import type { AppRole, UserProfile } from '../types';
 import {
   canAdminister,
   canImportMembers,
+  canManageAttendance,
   canViewMembers,
   roleResponsibility,
   type AppPage,
@@ -39,10 +39,14 @@ export function AppShell({
   const [open, setOpen] = useState(false);
   const role: AppRole = profile.role;
   const items: NavItem[] = [
-    { key: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={19} /> },
-    { key: 'attendance', label: 'Attendance', icon: <ClipboardCheck size={19} /> },
+    {
+      key: 'dashboard',
+      label: role === 'usher' ? 'Visitor Overview' : 'Dashboard',
+      icon: <LayoutDashboard size={19} />,
+    },
     { key: 'visitors', label: 'Visitor Care', icon: <ContactRound size={19} /> },
   ];
+  if (canManageAttendance(role)) items.splice(1, 0, { key: 'attendance', label: 'Attendance', icon: <ClipboardCheck size={19} /> });
   if (canViewMembers(role)) items.push({ key: 'members', label: 'Member Care', icon: <Users size={19} /> });
   if (canImportMembers(role)) items.push({ key: 'import', label: 'Import Members', icon: <FileUp size={19} /> });
   if (canAdminister(role)) items.push({ key: 'admin', label: 'Admin Center', icon: <ShieldCheck size={19} /> });
@@ -67,8 +71,7 @@ export function AppShell({
       <section className="workspace">
         <header>
           <button className="icon-btn mobile-menu" aria-label="Open menu" onClick={() => setOpen(true)}><Menu /></button>
-          <div><h1>{items.find(item => item.key === page)?.label || 'Workspace'}</h1><p>Community Church · {roleResponsibility(role)}</p></div>
-          <BarChart3 className="header-icon" />
+          <div><h1>{items.find(item => item.key === page)?.label || 'Workspace'}</h1><p>Central Islip SDA · {roleResponsibility(role)}</p></div>
         </header>
         <main className="content">{children}</main>
       </section>
