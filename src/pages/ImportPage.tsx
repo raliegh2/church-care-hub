@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileSpreadsheet, ShieldCheck, Upload } from 'lucide-react';
+import { CheckCircle2, FileSpreadsheet, ShieldCheck, Upload } from 'lucide-react';
 import { organizationId, supabase } from '../lib/supabase';
 import {
   MAX_IMPORT_FILE_BYTES,
@@ -68,41 +68,73 @@ export function ImportPage({ userId }: { userId: string }) {
   }
 
   return (
-    <section className="import-workspace">
-      <article className="panel import-card">
-        <FileSpreadsheet size={46} />
-        <h2>Import the member database</h2>
-        <p>
-          Pastors and administrators can upload a CSV or modern Excel workbook. The first worksheet should contain
-          First Name and Last Name columns, or one Full Name column. Optional columns include Email, Phone, Address,
-          Ministry and Date Joined.
-        </p>
-        <div className="import-limits">
-          <span><ShieldCheck size={16} /> Local validation before upload</span>
-          <span>Up to {MAX_IMPORT_ROWS.toLocaleString()} rows</span>
-          <span>Up to {Math.round(MAX_IMPORT_FILE_BYTES / 1024 / 1024)} MB</span>
-        </div>
-        {message && <div className={`notice${isError ? ' error' : ''}`}>{message}</div>}
-        <label className="file-button">
-          <Upload /> Choose CSV or Excel file
-          <input
-            type="file"
-            accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            onChange={event => {
-              const file = event.target.files?.[0];
-              if (file) void choose(file);
-              event.currentTarget.value = '';
-            }}
-          />
-        </label>
-      </article>
+    <section className="import-workspace redesign-import">
+      <div className="import-stepper" aria-label="Member import progress">
+        <span className="complete"><i>1</i><strong>Upload file</strong><small>{fileName ? 'Complete' : 'Current step'}</small></span>
+        <span className={rows.length ? 'complete' : 'active'}><i>2</i><strong>Map columns</strong><small>{rows.length ? 'Auto-mapped' : 'Waiting for file'}</small></span>
+        <span className={rows.length ? 'active' : ''}><i>3</i><strong>Review records</strong><small>{rows.length ? `${rows.length} ready` : 'Not started'}</small></span>
+        <span><i>4</i><strong>Import</strong><small>Not started</small></span>
+      </div>
+
+      <div className="import-top-grid">
+        <article className="panel import-file-card">
+          <div className="panel-title-row"><div><h2>Uploaded file</h2><p>CSV or modern Excel workbook.</p></div><FileSpreadsheet size={22} /></div>
+          {fileName ? (
+            <div className="uploaded-file-summary">
+              <span className="file-icon"><FileSpreadsheet /></span>
+              <span><strong>{fileName}</strong><small>{rows.length ? `${rows.length} valid records detected` : 'Validating file…'}</small></span>
+              {rows.length > 0 && <em>Ready</em>}
+            </div>
+          ) : (
+            <label className="file-button import-dropzone">
+              <Upload />
+              <strong>Choose a CSV or Excel file</strong>
+              <span>Up to {MAX_IMPORT_ROWS.toLocaleString()} rows and {Math.round(MAX_IMPORT_FILE_BYTES / 1024 / 1024)} MB</span>
+              <input
+                type="file"
+                accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                onChange={event => {
+                  const file = event.target.files?.[0];
+                  if (file) void choose(file);
+                  event.currentTarget.value = '';
+                }}
+              />
+            </label>
+          )}
+          {fileName && (
+            <label className="file-button replace-file-button">
+              <Upload size={17} /> Replace file
+              <input
+                type="file"
+                accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                onChange={event => {
+                  const file = event.target.files?.[0];
+                  if (file) void choose(file);
+                  event.currentTarget.value = '';
+                }}
+              />
+            </label>
+          )}
+        </article>
+
+        <article className="panel column-mapping-card">
+          <div className="panel-title-row"><div><h2>Column mapping</h2><p>Spreadsheet headers are matched automatically to member fields.</p></div><ShieldCheck size={22} /></div>
+          <div className="mapping-list">
+            <span><strong>Required</strong><small>First Name + Last Name, or Full Name</small></span>
+            <span><strong>Optional</strong><small>Email, Phone, Address, Ministry, Date Joined</small></span>
+            <span className={rows.length ? 'mapped' : ''}><CheckCircle2 /><small>{rows.length ? 'Headers mapped and validated' : 'Upload a file to validate its headers'}</small></span>
+          </div>
+        </article>
+      </div>
+
+      {message && <div className={`notice${isError ? ' error' : ''}`}>{message}</div>}
 
       {rows.length > 0 && (
         <article className="panel import-preview">
           <div className="section-heading">
             <div>
-              <h2>Import preview</h2>
-              <p>{fileName} · {rows.length} validated rows</p>
+              <h2>Preview</h2>
+              <p>{rows.length} validated member records are ready for review.</p>
             </div>
             <button className="primary" disabled={busy} onClick={() => void upload()}>
               {busy ? 'Importing…' : `Import ${rows.length} members`}
@@ -110,15 +142,15 @@ export function ImportPage({ userId }: { userId: string }) {
           </div>
           <div className="table-wrap">
             <table>
-              <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Ministry</th><th>Date joined</th></tr></thead>
+              <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Ministry</th><th>Status</th></tr></thead>
               <tbody>
                 {rows.slice(0, 25).map((row, index) => (
                   <tr key={`${row.email || row.phone || row.first_name}-${index}`}>
-                    <td>{row.first_name} {row.last_name}</td>
+                    <td><strong>{row.first_name} {row.last_name}</strong></td>
                     <td>{row.email || '—'}</td>
                     <td>{row.phone || '—'}</td>
                     <td>{row.ministry || '—'}</td>
-                    <td>{row.joined_date || '—'}</td>
+                    <td><span className="table-status ready">Ready</span></td>
                   </tr>
                 ))}
               </tbody>

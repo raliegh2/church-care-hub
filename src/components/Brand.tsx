@@ -1,12 +1,16 @@
-import { Church } from 'lucide-react';
-
-export function Brand({ compact = false }: { compact?: boolean }) {
+export function Brand({
+  compact = false,
+  subtitle = 'Church Care System',
+}: {
+  compact?: boolean;
+  subtitle?: string;
+}) {
   return (
-    <div className="brand">
-      <span className="brand-mark"><Church size={compact ? 20 : 26} /></span>
-      <span>
+    <div className={`brand${compact ? ' brand-compact' : ''}`}>
+      <span className="brand-mark" aria-hidden="true" />
+      <span className="brand-copy">
         <strong>Central Islip SDA</strong>
-        {!compact && <small>Visitor, member and pastoral care</small>}
+        {!compact && <small>{subtitle}</small>}
       </span>
     </div>
   );
