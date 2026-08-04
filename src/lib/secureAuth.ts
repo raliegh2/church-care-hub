@@ -68,16 +68,15 @@ export async function secureSignIn(email: string, password: string): Promise<voi
 }
 
 /**
- * After a successful password reset, clear any login throttle that is still in
- * effect for this account. A user who reset their password because they were
- * locked out by failed sign-ins would otherwise remain blocked and unable to
- * use the new password. Best-effort: any failure here is swallowed so it never
- * blocks the reset flow itself.
+ * Clear login throttles while the password-recovery session is still valid.
+ * Supabase terminates the current session when the password changes, so this
+ * must run before updateUser({ password }). Best-effort: a cleanup failure must
+ * never prevent the user from setting a new password.
  */
-export async function clearLoginThrottleAfterReset(): Promise<void> {
+export async function clearLoginThrottleForPasswordReset(): Promise<boolean> {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
-  if (!token) return;
+  if (!token) return false;
 
   const headers: Record<string, string> = {
     apikey: supabasePublishableKey,
@@ -86,14 +85,15 @@ export async function clearLoginThrottleAfterReset(): Promise<void> {
   };
 
   try {
-    await fetch(`${supabaseUrl}/functions/v1/secure-login`, {
+    const response = await fetch(`${supabaseUrl}/functions/v1/secure-login`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ action: 'reset_complete' }),
       cache: 'no-store',
       credentials: 'omit',
     });
+    return response.ok;
   } catch {
-    // Non-fatal: the password was already updated successfully.
+    return false;
   }
 }
