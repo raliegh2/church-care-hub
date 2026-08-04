@@ -21,6 +21,7 @@ export interface Visitor {
   first_visit_date: string;
   contact_consent: boolean;
   active: boolean;
+  created_by: string;
   created_at: string;
 }
 
@@ -34,19 +35,38 @@ export interface Member {
   address?: string | null;
   ministry?: string | null;
   joined_date?: string | null;
+  membership_status?: string;
+  last_contact_at?: string | null;
   active: boolean;
+  created_by: string;
   created_at: string;
 }
 
 export interface CareNote {
   id: string;
+  organization_id: string;
   note_text: string;
   note_type: string;
   status: string;
   visibility: string;
+  created_by: string;
   created_at: string;
+  updated_at?: string;
+  resolved_at?: string | null;
   visitor_id?: string | null;
   member_id?: string | null;
+}
+
+export interface VisitRecord {
+  id: string;
+  organization_id: string;
+  visitor_id?: string | null;
+  member_id?: string | null;
+  visited_at: string;
+  visited_by: string;
+  outcome: string;
+  summary?: string | null;
+  created_at: string;
 }
 
 export interface AttendanceSession {
