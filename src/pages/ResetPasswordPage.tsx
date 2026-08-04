@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Brand } from '../components/Brand';
 import { supabase } from '../lib/supabase';
-import { clearLoginThrottleAfterReset } from '../lib/secureAuth';
+import { clearLoginThrottleForPasswordReset } from '../lib/secureAuth';
 
 export function ResetPasswordPage({onDone}:{onDone:()=>void}){
   const [message,setMessage]=useState('');
@@ -24,15 +24,16 @@ export function ResetPasswordPage({onDone}:{onDone:()=>void}){
     }
 
     setBusy(true);
+    // Supabase terminates the recovery session when the password changes. Clear
+    // the login throttle first, while the recovery token can still be verified.
+    await clearLoginThrottleForPasswordReset();
+
     const {error}=await supabase.auth.updateUser({password});
     if(error){
       setBusy(false);
       setMessage(error.message);
       return;
     }
-    // Clear any login throttle left over from the failed sign-ins that led to
-    // this reset, so the new password works right away.
-    await clearLoginThrottleAfterReset();
     setBusy(false);
     onDone();
   }
