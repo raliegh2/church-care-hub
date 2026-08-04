@@ -30,7 +30,27 @@ jobs:
         run: npm ci
 
       - name: Build production bundle
-        run: npm run build
+        env:
+          # These are public client-side values (they are shipped in the
+          # browser bundle by design). Define them under:
+          #   Settings -> Secrets and variables -> Actions -> Variables
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_ORGANIZATION_ID: ${{ vars.VITE_ORGANIZATION_ID }}
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_PUBLISHABLE_KEY" ] || [ -z "$VITE_ORGANIZATION_ID" ]; then
+            echo "::error::Missing one or more VITE_ build variables. Add VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY and VITE_ORGANIZATION_ID under Settings -> Secrets and variables -> Actions -> Variables."
+            exit 1
+          fi
+          npm run build
+
+      - name: Verify the config was baked into the bundle
+        shell: bash
+        run: |
+          if ! grep -rq "supabase.co" dist/assets; then
+            echo "::error::Built bundle does not contain the Supabase URL; environment injection failed. Refusing to publish a blank-screen build."
+            exit 1
+          fi
 
       - name: Upload production bundle
         uses: actions/upload-artifact@v4

@@ -66,3 +66,34 @@ export async function secureSignIn(email: string, password: string): Promise<voi
     throw new SecureLoginError('The secure session could not be established. Please sign in again.');
   }
 }
+
+/**
+ * After a successful password reset, clear any login throttle that is still in
+ * effect for this account. A user who reset their password because they were
+ * locked out by failed sign-ins would otherwise remain blocked and unable to
+ * use the new password. Best-effort: any failure here is swallowed so it never
+ * blocks the reset flow itself.
+ */
+export async function clearLoginThrottleAfterReset(): Promise<void> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) return;
+
+  const headers: Record<string, string> = {
+    apikey: supabasePublishableKey,
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  };
+
+  try {
+    await fetch(`${supabaseUrl}/functions/v1/secure-login`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ action: 'reset_complete' }),
+      cache: 'no-store',
+      credentials: 'omit',
+    });
+  } catch {
+    // Non-fatal: the password was already updated successfully.
+  }
+}

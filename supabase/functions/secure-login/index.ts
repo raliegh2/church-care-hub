@@ -157,17 +157,48 @@ Deno.serve(async (req: Request) => {
     return json(origin, 403, { error: 'Request could not be authorized.' });
   }
 
-  let credentials: { email?: unknown; password?: unknown };
+  let body: { email?: unknown; password?: unknown; action?: unknown };
   try {
-    credentials = await req.json();
+    body = await req.json();
   } catch {
     return json(origin, 400, { error: 'Invalid request.' });
   }
 
-  const email = typeof credentials.email === 'string'
-    ? credentials.email.trim().toLowerCase()
+  // Authenticated post-password-reset cleanup. A user who was locked out by
+  // failed sign-ins and then reset their password would otherwise remain
+  // blocked for the rest of the window and be unable to use the new password.
+  // We verify the caller's recovery/session token with the service role and
+  // clear only that user's email throttle bucket. This returns before the
+  // normal sign-in logic, so ordinary login behaviour is unchanged.
+  if (body && body.action === 'reset_complete') {
+    const authHeader = req.headers.get('authorization') || '';
+    const token = authHeader.toLowerCase().startsWith('bearer ')
+      ? authHeader.slice(7).trim()
+      : '';
+    if (!token) {
+      return json(origin, 401, { error: 'Authentication required.' });
+    }
+
+    const { data: userData, error: userError } = await admin.auth.getUser(token);
+    const verifiedEmail = userData?.user?.email?.trim().toLowerCase() || '';
+    if (userError || !verifiedEmail) {
+      return json(origin, 401, { error: 'Authentication required.' });
+    }
+
+    try {
+      const emailHash = await sha256(`email:${verifiedEmail}`);
+      await clearLimit(`email:${emailHash}`);
+    } catch {
+      return json(origin, 503, { error: 'Sign-in is temporarily unavailable.' });
+    }
+
+    return json(origin, 200, { cleared: true });
+  }
+
+  const email = typeof body.email === 'string'
+    ? body.email.trim().toLowerCase()
     : '';
-  const password = typeof credentials.password === 'string' ? credentials.password : '';
+  const password = typeof body.password === 'string' ? body.password : '';
 
   if (!email || email.length > 254 || !password || password.length > 1024) {
     return json(origin, 401, { error: 'The email or password is incorrect.' });
