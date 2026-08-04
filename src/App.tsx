@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { AppShell } from './components/AppShell';
 import { Loading } from './components/Loading';
+import { canAccessPage, type AppPage } from './lib/permissions';
 import { supabase } from './lib/supabase';
 import { AdminPage } from './pages/AdminPage';
 import { AttendancePage } from './pages/AttendancePage';
@@ -13,8 +14,7 @@ import { PendingPage } from './pages/PendingPage';
 import { PeoplePage } from './pages/PeoplePage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import type { UserProfile } from './types';
-
-type Page = 'dashboard' | 'attendance' | 'visitors' | 'members' | 'import' | 'admin';
+import './care-workspace.css';
 
 function timeoutAfter(milliseconds: number) {
   return new Promise<never>((_, reject) => {
@@ -27,7 +27,7 @@ export default function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [recovering, setRecovering] = useState(false);
-  const [page, setPage] = useState<Page>('dashboard');
+  const [page, setPage] = useState<AppPage>('dashboard');
 
   const loadProfile = useCallback(async (current: Session | null) => {
     if (!current) {
@@ -66,7 +66,7 @@ export default function App() {
         setLoading(false);
         if (data.session) void loadProfile(data.session);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Unable to initialize session', error);
         if (active) {
           setSession(null);
@@ -76,9 +76,7 @@ export default function App() {
       })
       .finally(() => window.clearTimeout(fallback));
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, next) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, next) => {
       if (!active) return;
       if (event === 'PASSWORD_RECOVERY') setRecovering(true);
       setSession(next);
@@ -91,6 +89,10 @@ export default function App() {
       subscription.unsubscribe();
     };
   }, [loadProfile]);
+
+  useEffect(() => {
+    if (profile && !canAccessPage(profile.role, page)) setPage('dashboard');
+  }, [page, profile]);
 
   if (loading) return <Loading />;
   if (!session) return <AuthPage />;
@@ -105,14 +107,19 @@ export default function App() {
   }
   if (profile.role_status === 'pending') return <PendingPage />;
 
+  const safePage = canAccessPage(profile.role, page) ? page : 'dashboard';
+  const selectPage = (nextPage: AppPage) => {
+    if (canAccessPage(profile.role, nextPage)) setPage(nextPage);
+  };
+
   return (
-    <AppShell profile={profile} page={page} setPage={setPage} signOut={() => void supabase.auth.signOut()}>
-      {page === 'dashboard' && <DashboardPage />}
-      {page === 'attendance' && <AttendancePage userId={session.user.id} />}
-      {page === 'visitors' && <PeoplePage type="visitor" userId={session.user.id} />}
-      {page === 'members' && <PeoplePage type="member" userId={session.user.id} />}
-      {page === 'import' && <ImportPage userId={session.user.id} />}
-      {page === 'admin' && <AdminPage />}
+    <AppShell profile={profile} page={safePage} setPage={selectPage} signOut={() => void supabase.auth.signOut()}>
+      {safePage === 'dashboard' && <DashboardPage />}
+      {safePage === 'attendance' && <AttendancePage userId={session.user.id} />}
+      {safePage === 'visitors' && <PeoplePage type="visitor" userId={session.user.id} role={profile.role} />}
+      {safePage === 'members' && <PeoplePage type="member" userId={session.user.id} role={profile.role} />}
+      {safePage === 'import' && <ImportPage userId={session.user.id} />}
+      {safePage === 'admin' && <AdminPage userId={session.user.id} />}
     </AppShell>
   );
 }
