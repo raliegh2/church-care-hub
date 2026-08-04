@@ -164,12 +164,11 @@ Deno.serve(async (req: Request) => {
     return json(origin, 400, { error: 'Invalid request.' });
   }
 
-  // Authenticated post-password-reset cleanup. A user who was locked out by
-  // failed sign-ins and then reset their password would otherwise remain
-  // blocked for the rest of the window and be unable to use the new password.
-  // We verify the caller's recovery/session token with the service role and
-  // clear only that user's email throttle bucket. This returns before the
-  // normal sign-in logic, so ordinary login behaviour is unchanged.
+  // Clear both rate-limit buckets while the recovery session is still valid.
+  // Password changes terminate the current Supabase session, so the client must
+  // call this action before updateUser({ password }). The bearer token is
+  // verified server-side and only that user's email bucket plus the caller's IP
+  // bucket are cleared.
   if (body && body.action === 'reset_complete') {
     const authHeader = req.headers.get('authorization') || '';
     const token = authHeader.toLowerCase().startsWith('bearer ')
@@ -186,8 +185,14 @@ Deno.serve(async (req: Request) => {
     }
 
     try {
-      const emailHash = await sha256(`email:${verifiedEmail}`);
-      await clearLimit(`email:${emailHash}`);
+      const [emailHash, ipHash] = await Promise.all([
+        sha256(`email:${verifiedEmail}`),
+        sha256(`ip:${clientIp(req)}`),
+      ]);
+      await Promise.all([
+        clearLimit(`email:${emailHash}`),
+        clearLimit(`ip:${ipHash}`),
+      ]);
     } catch {
       return json(origin, 503, { error: 'Sign-in is temporarily unavailable.' });
     }
