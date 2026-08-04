@@ -31,16 +31,16 @@ jobs:
 
       - name: Build production bundle
         env:
-          # These are public client-side values (they are shipped in the
-          # browser bundle by design). Define them under:
-          #   Settings -> Secrets and variables -> Actions
-          # Either the Variables tab or the Secrets tab works.
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY || secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          # Public client-side values (shipped in the browser bundle by design).
+          # Define them under Settings -> Secrets and variables -> Actions.
+          # Both the canonical names and the VITE_ORGANIZATION_* aliases that
+          # were used when the variables were first created are accepted.
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || vars.VITE_ORGANIZATION_URL || secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY || vars.VITE_ORGANIZATION_PUBLISHABLE || secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
           VITE_ORGANIZATION_ID: ${{ vars.VITE_ORGANIZATION_ID || secrets.VITE_ORGANIZATION_ID }}
         run: |
           if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_PUBLISHABLE_KEY" ] || [ -z "$VITE_ORGANIZATION_ID" ]; then
-            echo "::error::Missing one or more VITE_ build values. Add VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY and VITE_ORGANIZATION_ID under Settings -> Secrets and variables -> Actions (Variables or Secrets tab)."
+            echo "::error::Missing one or more VITE_ build values. Add VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY and VITE_ORGANIZATION_ID under Settings -> Secrets and variables -> Actions."
             exit 1
           fi
           npm run build
