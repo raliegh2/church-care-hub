@@ -105,7 +105,9 @@ export default function App() {
       />
     );
   }
-  if (profile.role_status === 'pending') return <PendingPage />;
+  if (!profile.active || profile.role_status !== 'approved') {
+    return <PendingPage status={profile.role_status} active={profile.active} />;
+  }
 
   const safePage = canAccessPage(profile.role, page) ? page : 'dashboard';
   const selectPage = (nextPage: AppPage) => {
@@ -114,7 +116,7 @@ export default function App() {
 
   return (
     <AppShell profile={profile} page={safePage} setPage={selectPage} signOut={() => void supabase.auth.signOut()}>
-      {safePage === 'dashboard' && <DashboardPage />}
+      {safePage === 'dashboard' && <DashboardPage role={profile.role} />}
       {safePage === 'attendance' && <AttendancePage userId={session.user.id} />}
       {safePage === 'visitors' && <PeoplePage type="visitor" userId={session.user.id} role={profile.role} />}
       {safePage === 'members' && <PeoplePage type="member" userId={session.user.id} role={profile.role} />}

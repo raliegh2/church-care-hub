@@ -84,13 +84,13 @@ export function AdminPage({ userId }: { userId: string }) {
     if (!error) await load();
   }
 
-  const pending = users.filter(user => user.role_status === 'pending');
+  const pending = users.filter(user => user.role_status === 'pending' && user.requested_role === 'pastor');
 
   return (
     <section className="admin-workspace">
       {message && <div className={`notice${isError ? ' error' : ''}`}>{message}</div>}
       <div className="admin-heading">
-        <div><div className="eyebrow">Administrator only</div><h2>System oversight and maintenance</h2><p>Monitor every ministry workspace, approve access and maintain user responsibility assignments.</p></div>
+        <div><div className="eyebrow">Administrator only</div><h2>System oversight and maintenance</h2><p>Monitor every ministry workspace, approve pastor access and maintain user responsibility assignments.</p></div>
         <button className="secondary" onClick={() => void load()}><RefreshCw size={17} /> Refresh</button>
       </div>
 
@@ -105,7 +105,7 @@ export function AdminPage({ userId }: { userId: string }) {
 
       <section className="two-col admin-columns">
         <article className="panel">
-          <div className="section-heading"><div><h2>Pastor access requests</h2><p>Pastor accounts remain limited until an administrator approves them.</p></div><ShieldCheck /></div>
+          <div className="section-heading"><div><h2>Pastor access requests</h2><p>Pastor accounts remain locked until an administrator approves them.</p></div><ShieldCheck /></div>
           <div className="rows">
             {pending.map(user => (
               <div className="admin-row" key={user.id}>
@@ -133,7 +133,7 @@ export function AdminPage({ userId }: { userId: string }) {
       </section>
 
       <article className="panel">
-        <div className="section-heading"><div><h2>User responsibility assignments</h2><p>Assign the section each approved user is responsible for, or suspend access immediately.</p></div><UserCog /></div>
+        <div className="section-heading"><div><h2>User responsibility assignments</h2><p>Assign each approved user to the correct workspace, or suspend access immediately.</p></div><UserCog /></div>
         <div className="table-wrap">
           <table className="admin-access-table">
             <thead><tr><th>User</th><th>Current responsibility</th><th>Account status</th><th>Access summary</th></tr></thead>
@@ -184,7 +184,7 @@ function CheckCircle() {
 }
 
 function roleSummary(role: AppRole): string {
-  if (role === 'usher') return 'Attendance, visitors, visitor visits and visitor support notes';
-  if (role === 'pastor') return 'All usher sections plus members, imports and pastoral care';
+  if (role === 'usher') return 'Visitors, visitor totals, visitor visits and visitor support notes';
+  if (role === 'pastor') return 'Visitors, attendance, members, imports and pastoral care';
   return 'Full access to every workspace and administrator controls';
 }
