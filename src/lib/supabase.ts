@@ -1,5 +1,27 @@
 import { createClient } from '@supabase/supabase-js';
 
+export const canonicalAppOrigin = 'https://church-care-hub.vercel.app';
+
+/**
+ * Older password-reset emails can still open the retired Vercel deployment.
+ * When that deployment receives a new build from this repository, move the
+ * browser to the canonical app while preserving Supabase recovery parameters.
+ */
+function redirectRetiredDeployment(): void {
+  if (typeof window === 'undefined') return;
+
+  const retiredHosts = new Set([
+    'church-visitor-attendance-productio.vercel.app',
+  ]);
+
+  if (!retiredHosts.has(window.location.hostname)) return;
+
+  const destination = `${canonicalAppOrigin}${window.location.pathname}${window.location.search}${window.location.hash}`;
+  window.location.replace(destination);
+}
+
+redirectRetiredDeployment();
+
 export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
 export const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 

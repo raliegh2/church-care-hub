@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Brand } from '../components/Brand';
 import { secureSignIn, SecureLoginError } from '../lib/secureAuth';
-import { supabase } from '../lib/supabase';
+import { canonicalAppOrigin, supabase } from '../lib/supabase';
 
 export function AuthPage() {
   const [signup, setSignup] = useState(false);
@@ -44,7 +44,7 @@ export function AuthPage() {
           password,
           options: {
             data: { display_name: name },
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${canonicalAppOrigin}/`,
           },
         });
 
@@ -86,7 +86,7 @@ export function AuthPage() {
     setBusy(true);
     setIsError(false);
     const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-      redirectTo: `${window.location.origin}/`,
+      redirectTo: `${canonicalAppOrigin}/`,
     });
     setBusy(false);
 
