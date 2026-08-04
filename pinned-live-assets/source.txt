@@ -1,4 +1,4 @@
 origin=https://church-care-hub.vercel.app
-javascript=https://cdn.jsdelivr.net/gh/raliegh2/church-care-hub@0a7c8eb90e85da5fcbf5877713d48cc66e3995b0/release-assets/assets/index-546fwRPM.js
-stylesheet=https://cdn.jsdelivr.net/gh/raliegh2/church-care-hub@0a7c8eb90e85da5fcbf5877713d48cc66e3995b0/release-assets/assets/index-Bjennlrb.css
-captured_at=2026-08-04T16:46:57Z
+javascript=https://church-care-hub.vercel.app/assets/index-DRG7l9Ow.js
+stylesheet=https://church-care-hub.vercel.app/assets/index-Bjennlrb.css
+captured_at=2026-08-04T16:52:39Z
