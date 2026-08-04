@@ -3,6 +3,15 @@ import { createClient } from '@supabase/supabase-js';
 export const canonicalAppOrigin = 'https://church-care-hub.vercel.app';
 
 /**
+ * These are public browser-client settings. Environment variables can override
+ * them, but production remains functional if a hosting project is recreated or
+ * its Vite variables are accidentally removed.
+ */
+const defaultSupabaseUrl = 'https://vzjcudzsheiszdailwns.supabase.co';
+const defaultSupabasePublishableKey = 'sb_publishable_jQr7KcgsDrPf0yptfJloXA_WtC93lpL';
+const defaultOrganizationId = 'a9456be1-5b06-4fbb-b5c1-cd5b66b3ff6a';
+
+/**
  * Older password-reset emails can still open the retired Vercel deployment.
  * When that deployment receives a new build from this repository, move the
  * browser to the canonical app while preserving Supabase recovery parameters.
@@ -22,14 +31,16 @@ function redirectRetiredDeployment(): void {
 
 redirectRetiredDeployment();
 
-export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-export const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+export const supabaseUrl =
+  (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim() || defaultSupabaseUrl;
+export const supabasePublishableKey =
+  (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined)?.trim() || defaultSupabasePublishableKey;
+export const organizationId =
+  (import.meta.env.VITE_ORGANIZATION_ID as string | undefined)?.trim() || defaultOrganizationId;
 
 /**
- * Render a readable message instead of a blank white screen when the client
- * configuration was not baked into the build. A hard throw before React mounts
- * otherwise leaves users (especially on mobile) with no indication of what went
- * wrong.
+ * Render a readable message instead of a blank white screen if the public
+ * client configuration is ever invalid.
  */
 function renderConfigError(): void {
   if (typeof document === 'undefined') return;
@@ -39,15 +50,23 @@ function renderConfigError(): void {
     '<div style="min-height:100vh;display:grid;place-items:center;padding:24px;' +
     'font-family:Inter,system-ui,-apple-system,sans-serif;color:#102438;text-align:center">' +
     '<div style="max-width:440px">' +
-    '<h1 style="margin:0 0 8px;color:#071a2b">Church Care Hub</h1>' +
+    '<h1 style="margin:0 0 8px;color:#071a2b">Central Islip SDA</h1>' +
     '<p style="color:#637487;line-height:1.55">This site is temporarily unavailable because its ' +
-    'configuration is incomplete. Please contact the administrator and try again shortly.</p>' +
+    'configuration is invalid. Please contact the administrator and try again shortly.</p>' +
     '</div></div>';
 }
 
-if (!supabaseUrl || !supabasePublishableKey) {
+let configurationValid = true;
+try {
+  const parsedUrl = new URL(supabaseUrl);
+  configurationValid = parsedUrl.protocol === 'https:' && Boolean(supabasePublishableKey) && Boolean(organizationId);
+} catch {
+  configurationValid = false;
+}
+
+if (!configurationValid) {
   renderConfigError();
-  throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY.');
+  throw new Error('Invalid public Supabase client configuration.');
 }
 
 /**
@@ -71,7 +90,6 @@ function clearLegacyPersistedSession(): void {
 
 clearLegacyPersistedSession();
 
-export const organizationId = import.meta.env.VITE_ORGANIZATION_ID as string;
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
     persistSession: false,
