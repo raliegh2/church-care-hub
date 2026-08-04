@@ -25,7 +25,28 @@ redirectRetiredDeployment();
 export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
 export const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
+/**
+ * Render a readable message instead of a blank white screen when the client
+ * configuration was not baked into the build. A hard throw before React mounts
+ * otherwise leaves users (especially on mobile) with no indication of what went
+ * wrong.
+ */
+function renderConfigError(): void {
+  if (typeof document === 'undefined') return;
+  const root = document.getElementById('root');
+  if (!root) return;
+  root.innerHTML =
+    '<div style="min-height:100vh;display:grid;place-items:center;padding:24px;' +
+    'font-family:Inter,system-ui,-apple-system,sans-serif;color:#102438;text-align:center">' +
+    '<div style="max-width:440px">' +
+    '<h1 style="margin:0 0 8px;color:#071a2b">Church Care Hub</h1>' +
+    '<p style="color:#637487;line-height:1.55">This site is temporarily unavailable because its ' +
+    'configuration is incomplete. Please contact the administrator and try again shortly.</p>' +
+    '</div></div>';
+}
+
 if (!supabaseUrl || !supabasePublishableKey) {
+  renderConfigError();
   throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY.');
 }
 
