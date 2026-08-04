@@ -28,16 +28,27 @@ jobs:
 
           live_origin="https://church-care-hub.vercel.app"
           html="$(curl --fail --silent --show-error --location "${live_origin}/")"
-          js_path="$(printf '%s' "$html" | grep -oE 'src="/assets/[^"]+\.js"' | head -n 1 | cut -d'"' -f2)"
-          css_path="$(printf '%s' "$html" | grep -oE 'href="/assets/[^"]+\.css"' | head -n 1 | cut -d'"' -f2)"
+          js_path="$(printf '%s' "$html" | grep -oE 'src="[^"]+\.js"' | head -n 1 | cut -d'"' -f2)"
+          css_path="$(printf '%s' "$html" | grep -oE 'href="[^"]+\.css"' | head -n 1 | cut -d'"' -f2)"
 
           test -n "$js_path"
           test -n "$css_path"
 
+          resolve_asset_url() {
+            case "$1" in
+              http://*|https://*) printf '%s' "$1" ;;
+              /*) printf '%s%s' "$live_origin" "$1" ;;
+              *) printf '%s/%s' "$live_origin" "$1" ;;
+            esac
+          }
+
+          js_url="$(resolve_asset_url "$js_path")"
+          css_url="$(resolve_asset_url "$css_path")"
+
           rm -rf pinned-live-assets
           mkdir -p pinned-live-assets/assets
-          curl --fail --silent --show-error --location "${live_origin}${js_path}" -o pinned-live-assets/assets/app.js
-          curl --fail --silent --show-error --location "${live_origin}${css_path}" -o pinned-live-assets/assets/base.css
+          curl --fail --silent --show-error --location "$js_url" -o pinned-live-assets/assets/app.js
+          curl --fail --silent --show-error --location "$css_url" -o pinned-live-assets/assets/base.css
 
           test "$(wc -c < pinned-live-assets/assets/app.js)" -gt 100000
           test "$(wc -c < pinned-live-assets/assets/base.css)" -gt 1000
@@ -45,8 +56,8 @@ jobs:
 
           printf '%s\n' \
             "origin=${live_origin}" \
-            "javascript=${js_path}" \
-            "stylesheet=${css_path}" \
+            "javascript=${js_url}" \
+            "stylesheet=${css_url}" \
             "captured_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             > pinned-live-assets/source.txt
 
