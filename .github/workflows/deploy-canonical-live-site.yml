@@ -1,0 +1,79 @@
+name: Deploy canonical live site
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'release-assets/**'
+      - 'pinned-live-assets/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: church-care-hub-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VERCEL_ORG_ID: team_3nQA5DnPkQlITegWOewSIZ3B
+      VERCEL_PROJECT_ID: prj_fF3RVlwnosUv98wNwKDMjpulhKI5
+      VERCEL_SCOPE: ralieghsamuelbarnett-8850s-projects
+      CANONICAL_DOMAIN: church-care-hub.vercel.app
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Require Vercel deployment token
+        shell: bash
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::Missing repository secret VERCEL_TOKEN. Add a Vercel access token under Settings -> Secrets and variables -> Actions, then re-run this workflow."
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Link the canonical Vercel project
+        shell: bash
+        run: |
+          mkdir -p .vercel
+          printf '{"orgId":"%s","projectId":"%s"}\n' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
+          vercel pull --yes --environment=production --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"
+
+      - name: Deploy main to production
+        id: deploy
+        shell: bash
+        run: |
+          deployment_url="$(vercel deploy --prod --yes --force --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN")"
+          echo "deployment_url=$deployment_url" >> "$GITHUB_OUTPUT"
+          echo "Deployed $deployment_url"
+
+      - name: Assign canonical domain
+        shell: bash
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment_url }}
+        run: |
+          vercel alias set "$DEPLOYMENT_URL" "$CANONICAL_DOMAIN" --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"
+
+      - name: Verify canonical production deployment
+        shell: bash
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment_url }}
+        run: |
+          vercel inspect "$DEPLOYMENT_URL" --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 2 "https://$CANONICAL_DOMAIN/" >/dev/null
