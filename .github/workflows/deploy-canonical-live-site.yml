@@ -31,24 +31,30 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Require Vercel deployment token
+      - name: Detect Vercel deployment token
+        id: token
         shell: bash
         run: |
-          if [ -z "$VERCEL_TOKEN" ]; then
-            echo "::error::Missing repository secret VERCEL_TOKEN. Add a Vercel access token under Settings -> Secrets and variables -> Actions, then re-run this workflow."
-            exit 1
+          if [ -n "$VERCEL_TOKEN" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Canonical deployment skipped because repository secret VERCEL_TOKEN is not configured."
           fi
 
       - name: Set up Node.js
+        if: steps.token.outputs.available == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
       - name: Install Vercel CLI
+        if: steps.token.outputs.available == 'true'
         run: npm install --global vercel@latest
 
       - name: Link the canonical Vercel project
+        if: steps.token.outputs.available == 'true'
         shell: bash
         run: |
           mkdir -p .vercel
@@ -56,6 +62,7 @@ jobs:
           vercel pull --yes --environment=production --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"
 
       - name: Deploy main to production
+        if: steps.token.outputs.available == 'true'
         id: deploy
         shell: bash
         run: |
@@ -64,6 +71,7 @@ jobs:
           echo "Deployed $deployment_url"
 
       - name: Assign canonical domain
+        if: steps.token.outputs.available == 'true'
         shell: bash
         env:
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment_url }}
@@ -71,6 +79,7 @@ jobs:
           vercel alias set "$DEPLOYMENT_URL" "$CANONICAL_DOMAIN" --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"
 
       - name: Verify canonical production deployment
+        if: steps.token.outputs.available == 'true'
         shell: bash
         env:
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment_url }}
