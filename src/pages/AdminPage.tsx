@@ -10,6 +10,8 @@ import {
   Users,
   X,
 } from 'lucide-react';
+import { AdminSkeleton } from '../components/Skeleton';
+import { EmptyState } from '../components/Illustration';
 import { supabase } from '../lib/supabase';
 import type { AppRole, UserProfile } from '../types';
 
@@ -31,6 +33,7 @@ export function AdminPage({ userId }: { userId: string }) {
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     setMessage('');
@@ -46,6 +49,7 @@ export function AdminPage({ userId }: { userId: string }) {
     if (error) {
       setIsError(true);
       setMessage(error.message);
+      setLoading(false);
       return;
     }
     const profiles = (usersResult.data || []) as UserProfile[];
@@ -60,6 +64,7 @@ export function AdminPage({ userId }: { userId: string }) {
     });
     setLastUpdated(new Date());
     setIsError(false);
+    setLoading(false);
   }, []);
 
   useEffect(() => { void load(); }, [load]);
@@ -95,6 +100,8 @@ export function AdminPage({ userId }: { userId: string }) {
   }), [activeUsers]);
   const maxRoleCount = Math.max(1, roleCounts.usher, roleCounts.pastor, roleCounts.administrator);
 
+  if (loading) return <AdminSkeleton />;
+
   return (
     <section className="admin-workspace redesign-admin">
       {message && <div className={`notice${isError ? ' error' : ''}`}>{message}</div>}
@@ -124,7 +131,7 @@ export function AdminPage({ userId }: { userId: string }) {
                 </span>
               </div>
             ))}
-            {pending.length === 0 && <div className="empty compact-empty">No pastor requests are waiting.</div>}
+            {pending.length === 0 && <EmptyState name="members" title="No requests waiting" detail="Pastor access requests appear here for approval." />}
           </div>
         </article>
 
