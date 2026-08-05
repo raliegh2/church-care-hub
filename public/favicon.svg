@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Central Islip SDA Church Care Hub</title>
+  <desc id="desc">A gold cross and heart on a forest-green background.</desc>
+  <rect width="64" height="64" rx="15" fill="#123d2f"/>
+  <path d="M29 11h7v13h12v7H36v22h-7V31H17v-7h12z" fill="#d9ad4f"/>
+  <path d="M32 50c-8-5-13-9-13-15 0-4 3-7 7-7 3 0 5 1 6 4 1-3 3-4 6-4 4 0 7 3 7 7 0 6-5 10-13 15z" fill="#f7f1df" fill-opacity=".96"/>
+</svg>
