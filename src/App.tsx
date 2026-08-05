@@ -15,6 +15,7 @@ import { PeoplePage } from './pages/PeoplePage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import type { UserProfile } from './types';
 import './care-workspace.css';
+import './sanctuary.css';
 
 function timeoutAfter(milliseconds: number) {
   return new Promise<never>((_, reject) => {
