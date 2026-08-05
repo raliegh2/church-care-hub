@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Central Islip SDA Church Care Hub</title>
+  <desc id="desc">A forest-green and gold social card for the secure church ministry care workspace.</desc>
+  <rect width="1200" height="630" fill="#f4f7f2"/>
+  <circle cx="1040" cy="80" r="290" fill="#e1e9e1"/>
+  <circle cx="70" cy="650" r="270" fill="#f7efd8"/>
+  <rect x="90" y="70" width="1020" height="490" rx="44" fill="#fff" stroke="#d8e2d9" stroke-width="3"/>
+  <rect x="145" y="135" width="110" height="110" rx="28" fill="#123d2f"/>
+  <path d="M194 154h13v23h24v13h-24v45h-13v-45h-24v-13h24z" fill="#d9ad4f"/>
+  <path d="M201 226c-17-11-28-20-28-33 0-9 7-16 16-16 6 0 10 3 12 8 2-5 6-8 12-8 9 0 16 7 16 16 0 13-11 22-28 33z" fill="#f7f1df"/>
+  <text x="300" y="165" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" letter-spacing="4" fill="#9a7426">CENTRAL ISLIP SDA</text>
+  <text x="300" y="235" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="800" fill="#123d2f">Church Care Hub</text>
+  <text x="150" y="335" font-family="Arial, Helvetica, sans-serif" font-size="30" fill="#52675e">Secure visitor care, attendance, member support,</text>
+  <text x="150" y="378" font-family="Arial, Helvetica, sans-serif" font-size="30" fill="#52675e">and ministry follow-up in one coordinated workspace.</text>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#123d2f">
+    <rect x="150" y="430" width="170" height="50" rx="25" fill="#eff6f1" stroke="#d2e1d6"/><text x="175" y="462">Visitor care</text>
+    <rect x="335" y="430" width="160" height="50" rx="25" fill="#eff6f1" stroke="#d2e1d6"/><text x="365" y="462">Attendance</text>
+    <rect x="510" y="430" width="205" height="50" rx="25" fill="#eff6f1" stroke="#d2e1d6"/><text x="538" y="462">Member support</text>
+    <rect x="730" y="430" width="230" height="50" rx="25" fill="#eff6f1" stroke="#d2e1d6"/><text x="756" y="462">Role-based access</text>
+  </g>
+  <text x="150" y="525" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#52675e">church-care-hub.vercel.app</text>
+</svg>
