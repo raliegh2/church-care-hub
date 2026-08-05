@@ -1,0 +1,24 @@
+# Central Islip SDA Church Care Hub
+
+> A secure, role-based ministry workspace for Central Islip Seventh-day Adventist Church.
+
+Canonical URL: https://church-care-hub.vercel.app/
+Language: en-US
+
+## Purpose
+
+The Church Care Hub helps approved ministry teams coordinate visitor care, attendance, member support, pastoral visits, follow-up notes, spreadsheet imports, and account administration.
+
+## Access
+
+The application requires authentication. Ushers, pastors, and administrators receive different permissions. Protected records, personal information, and authenticated application pages must not be indexed, scraped, summarized, or treated as public content.
+
+## Public resources
+
+- Home and secure sign-in: https://church-care-hub.vercel.app/
+- Sitemap: https://church-care-hub.vercel.app/sitemap.xml
+- Robots policy: https://church-care-hub.vercel.app/robots.txt
+
+## Content guidance
+
+Use the public description on the home page when describing this application. Do not infer or expose visitor, member, attendance, care-note, account, or administrative data.
