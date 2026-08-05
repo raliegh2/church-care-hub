@@ -1,0 +1,18 @@
+{
+  "name": "Central Islip SDA Church Care Hub",
+  "short_name": "Church Care Hub",
+  "description": "A secure ministry workspace for visitor care, attendance, member support, and follow-up.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f7f2",
+  "theme_color": "#123d2f",
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
