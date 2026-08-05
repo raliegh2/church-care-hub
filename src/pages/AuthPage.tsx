@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Brand } from '../components/Brand';
+import { Illustration } from '../components/Illustration';
 import { secureSignIn, SecureLoginError } from '../lib/secureAuth';
 import { canonicalAppOrigin, supabase } from '../lib/supabase';
 
@@ -112,6 +113,7 @@ export function AuthPage() {
         <div className="auth-visual-content">
           <Brand subtitle="Care Ministry" />
           <div className="auth-kicker">Care, coordinated</div>
+          <div className="auth-artwork"><Illustration name="welcome" /></div>
           <h2>Every person seen.<br />Every need followed.</h2>
           <p>A secure workspace for ushers, pastors and administrators to care for visitors and members with clarity.</p>
           <blockquote>

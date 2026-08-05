@@ -9,6 +9,8 @@ import {
   StickyNote,
   UserRoundCheck,
 } from 'lucide-react';
+import { EmptyState } from '../components/Illustration';
+import { PeopleListSkeleton, PersonDetailSkeleton } from '../components/Skeleton';
 import { organizationId, supabase } from '../lib/supabase';
 import type { AppRole, CareNote, Member, VisitRecord, Visitor } from '../types';
 
@@ -41,6 +43,7 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
   const [editing, setEditing] = useState<Person | null | undefined>(undefined);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
+  const [loadingPeople, setLoadingPeople] = useState(true);
 
   const selected = people.find(person => person.id === selectedId) || null;
 
@@ -50,11 +53,13 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
     if (error) {
       setIsError(true);
       setMessage(error.message);
+      setLoadingPeople(false);
       return;
     }
     const next = (data || []) as Person[];
     setPeople(next);
     setSelectedId(current => current && next.some(person => person.id === current) ? current : next[0]?.id || null);
+    setLoadingPeople(false);
   }, [type]);
 
   const loadCareRecord = useCallback(async (personId: string | null) => {
@@ -157,7 +162,8 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
           </div>
           <label className="search"><Search size={18} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search by name or contact" /></label>
           <div className="rows person-rows">
-            {filtered.map(person => {
+            {loadingPeople && <PeopleListSkeleton />}
+            {!loadingPeople && filtered.map(person => {
               const isSelected = selectedId === person.id;
               return (
                 <button key={person.id} className={isSelected ? 'selected' : ''} onClick={() => setSelectedId(person.id)}>
@@ -166,7 +172,13 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
                 </button>
               );
             })}
-            {filtered.length === 0 && <div className="empty compact-empty">No matching records.</div>}
+            {!loadingPeople && filtered.length === 0 && (
+              <EmptyState
+                name={type === 'visitor' ? 'visitors' : 'members'}
+                title={query ? 'No matching records' : `No ${type} records yet`}
+                detail={query ? 'Try a different name or contact detail.' : `Add your first ${type} to start tracking care.`}
+              />
+            )}
           </div>
         </article>
 
@@ -183,7 +195,13 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
               onResolveNote={resolveNote}
               onVisit={recordVisit}
             />
-          ) : <div className="empty">Add or select a {type} to review visits and support needs.</div>}
+          ) : loadingPeople ? <PersonDetailSkeleton /> : (
+            <EmptyState
+              name="select"
+              title={`Select a ${type}`}
+              detail="Choose a record on the left to review visit history and support needs."
+            />
+          )}
         </article>
       </section>
 

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { ArrowUpRight, CalendarCheck2, ContactRound, HandHeart, Users } from 'lucide-react';
+import { DashboardSkeleton } from '../components/Skeleton';
+import { EmptyState } from '../components/Illustration';
 import { supabase } from '../lib/supabase';
 import type { AppRole, CareNote } from '../types';
 
@@ -59,6 +61,7 @@ export function DashboardPage({ role }: { role: AppRole }) {
   const [recentVisitors, setRecentVisitors] = useState<RecentVisitor[]>([]);
   const [weeklyCounts, setWeeklyCounts] = useState<number[]>(Array.from({ length: 8 }, () => 0));
   const [priorityItems, setPriorityItems] = useState<PriorityItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -89,6 +92,7 @@ export function DashboardPage({ role }: { role: AppRole }) {
           newVisitors: newVisitors.count || 0,
         });
         setPriorityItems([]);
+        setLoading(false);
         return;
       }
 
@@ -136,6 +140,7 @@ export function DashboardPage({ role }: { role: AppRole }) {
         visits: visits.count || 0,
         newVisitors: newVisitors.count || 0,
       });
+      setLoading(false);
     })();
 
     return () => { active = false; };
@@ -146,6 +151,8 @@ export function DashboardPage({ role }: { role: AppRole }) {
     const total = stats.members + stats.newVisitors;
     return total ? Math.round((stats.members / total) * 100) : 0;
   }, [stats.members, stats.newVisitors]);
+
+  if (loading) return <DashboardSkeleton compact={role === 'usher'} />;
 
   if (role === 'usher') {
     return (
@@ -180,7 +187,7 @@ export function DashboardPage({ role }: { role: AppRole }) {
                   <em>First visit</em>
                 </div>
               ))}
-              {recentVisitors.length === 0 && <div className="empty compact-empty">No visitor records yet.</div>}
+              {recentVisitors.length === 0 && <EmptyState name="visitors" title="No visitors recorded yet" detail="New visitor records appear here as soon as they are added." />}
             </div>
           </article>
         </div>
@@ -209,7 +216,7 @@ export function DashboardPage({ role }: { role: AppRole }) {
                 <em className={`priority-pill ${item.priority.toLowerCase()}`}>{item.priority}</em>
               </div>
             ))}
-            {priorityItems.length === 0 && <div className="empty compact-empty">No open care needs.</div>}
+            {priorityItems.length === 0 && <EmptyState name="notes" title="Nothing outstanding" detail="Every care need has been resolved. New requests will show up here." />}
           </div>
         </article>
 
