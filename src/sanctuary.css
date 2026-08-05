@@ -1,0 +1,221 @@
+/*
+ * Sanctuary — visual layer only.
+ *
+ * Loaded after care-workspace.css so it wins on specificity ties. Nothing here
+ * changes behaviour: no class name referenced by a permission check, a route,
+ * or a Supabase call is renamed or removed. Restyling happens through the token
+ * block below, so most future colour work is a one-line edit.
+ */
+
+:root {
+  --sanctuary-canvas: #faf8f3;
+  --sanctuary-surface: #ffffff;
+  --sanctuary-ink: #12352a;
+  --sanctuary-ink-soft: #6d7d75;
+  --sanctuary-line: #e6e0d3;
+  --sanctuary-line-soft: #f0ebe0;
+  --sanctuary-green: #1d4e3d;
+  --sanctuary-green-deep: #12352a;
+  --sanctuary-green-tint: #e7f2ec;
+  --sanctuary-gold: #a06a12;
+  --sanctuary-gold-tint: #fdf3da;
+  --sanctuary-radius: 14px;
+  --sanctuary-radius-sm: 10px;
+  --skeleton-base: #ece7dc;
+  --skeleton-sheen: #f7f4ec;
+}
+
+html,
+body { background: var(--sanctuary-canvas); }
+
+.app-shell { background: var(--sanctuary-canvas); }
+.sidebar { background: var(--sanctuary-green-deep); }
+.sidebar nav button.active { background: var(--sanctuary-green); border-radius: var(--sanctuary-radius-sm); }
+.panel,
+.status-card {
+  background: var(--sanctuary-surface);
+  border: 1px solid var(--sanctuary-line);
+  border-radius: var(--sanctuary-radius);
+}
+.workspace-heading h1 { color: var(--sanctuary-ink); }
+.workspace-heading p { color: var(--sanctuary-ink-soft); }
+
+/* ---------------------------------------------------------------- emblem */
+
+.emblem { display: block; }
+.emblem-halo { fill: var(--sanctuary-gold-tint); }
+.emblem-arch {
+  fill: none;
+  stroke: var(--sanctuary-green-deep);
+  stroke-width: 2.6;
+  stroke-linejoin: round;
+}
+.emblem-hand {
+  fill: none;
+  stroke: var(--sanctuary-green);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+.emblem-light { fill: var(--sanctuary-gold); }
+
+.emblem-animated .emblem-arch {
+  stroke-dasharray: 190;
+  stroke-dashoffset: 190;
+  animation: emblem-draw 1.5s cubic-bezier(.5, 0, .2, 1) forwards;
+}
+.emblem-animated .emblem-hand {
+  stroke-dasharray: 34;
+  stroke-dashoffset: 34;
+  animation: emblem-draw 1s ease-out .55s forwards;
+}
+.emblem-animated .emblem-light {
+  transform-origin: 32px 20px;
+  animation: emblem-pulse 2.4s ease-in-out 1.1s infinite;
+}
+.emblem-animated .emblem-halo {
+  transform-origin: center;
+  animation: emblem-breathe 3.2s ease-in-out infinite;
+}
+
+@keyframes emblem-draw { to { stroke-dashoffset: 0; } }
+@keyframes emblem-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .55; transform: scale(1.35); }
+}
+@keyframes emblem-breathe {
+  0%, 100% { opacity: .85; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+/* ---------------------------------------------------------- brand loader */
+
+.brand-loader {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--sanctuary-canvas);
+}
+.brand-loader-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 340px;
+  text-align: center;
+}
+.brand-loader-copy { display: flex; flex-direction: column; gap: 5px; }
+.brand-loader-copy strong {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--sanctuary-ink);
+  letter-spacing: -.02em;
+}
+.brand-loader-copy span { font-size: 14px; color: var(--sanctuary-ink-soft); }
+.brand-loader-copy small { font-size: 12px; color: #9aa8a1; }
+.brand-loader-track {
+  width: 168px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--sanctuary-line);
+  overflow: hidden;
+}
+.brand-loader-track span {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--sanctuary-gold);
+  animation: loader-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes loader-sweep {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(340%); }
+}
+
+/* -------------------------------------------------------------- skeleton */
+
+.skeleton {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: var(--skeleton-base);
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--skeleton-sheen), transparent);
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+@keyframes skeleton-shimmer { 100% { transform: translateX(100%); } }
+
+.skeleton-shell { display: flex; flex-direction: column; gap: 16px; }
+.skeleton-text { display: flex; flex-direction: column; gap: 7px; }
+.skeleton-panel { display: flex; flex-direction: column; gap: 12px; padding: 16px 18px; }
+.skeleton-metric { display: flex; flex-direction: column; gap: 9px; padding: 16px 18px; }
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--sanctuary-line-soft);
+}
+.skeleton-row-copy { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.skeleton-person-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--sanctuary-line-soft);
+}
+.skeleton-detail-head { display: flex; align-items: center; gap: 13px; }
+.skeleton-bars {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  align-items: end;
+  gap: 8px;
+  height: 116px;
+}
+.skeleton-bar { align-self: end; }
+
+/* --------------------------------------------------- empty states / art */
+
+.illustration { width: 148px; height: 111px; display: block; }
+.il-tint { fill: var(--sanctuary-green-tint); }
+.il-solid { fill: #c7d8ce; }
+.il-line { stroke: var(--sanctuary-green); stroke-width: 2.4; stroke-linecap: round; }
+.il-accent { fill: none; stroke: var(--sanctuary-gold); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 30px 22px;
+  text-align: center;
+}
+.empty-state strong { font-size: 15px; font-weight: 600; color: var(--sanctuary-ink); }
+.empty-state p { margin: 0; font-size: 13px; color: var(--sanctuary-ink-soft); max-width: 34ch; line-height: 1.55; }
+
+.auth-artwork { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.auth-artwork .illustration { width: 210px; height: 158px; }
+
+/* ------------------------------------------------------------- a11y */
+
+@media (prefers-reduced-motion: reduce) {
+  .emblem-animated .emblem-arch,
+  .emblem-animated .emblem-hand,
+  .emblem-animated .emblem-light,
+  .emblem-animated .emblem-halo,
+  .brand-loader-track span,
+  .skeleton::after {
+    animation: none;
+  }
+  .emblem-animated .emblem-arch,
+  .emblem-animated .emblem-hand { stroke-dashoffset: 0; }
+  .brand-loader-track span { width: 100%; }
+}
