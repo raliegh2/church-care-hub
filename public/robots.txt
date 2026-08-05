@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /attendance
+Disallow: /visitors
+Disallow: /members
+Disallow: /import-members
+Disallow: /administrator
+Disallow: /onboarding
+Disallow: /pending
+Disallow: /reset-password
+
+Sitemap: https://church-care-hub.vercel.app/sitemap.xml
