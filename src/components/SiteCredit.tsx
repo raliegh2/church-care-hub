@@ -1,3 +1,5 @@
+import './SiteCredit.css';
+
 export function SiteCredit() {
   return (
     <footer className="site-credit" aria-label="Website creator credit">
