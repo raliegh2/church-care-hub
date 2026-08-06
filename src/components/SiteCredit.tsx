@@ -2,8 +2,7 @@ import './SiteCredit.css';
 
 export function SiteCredit() {
   return (
-    <footer className="site-credit" aria-label="Website creator credit">
-      <span>Website designed and developed by</span>
+    <footer className="site-credit" aria-label="Cyventura">
       <img
         src="/cyventura-logo.svg"
         alt="Cyventura"
