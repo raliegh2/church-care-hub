@@ -447,6 +447,50 @@ button:active:not(:disabled) { transform: scale(.97); }
 .workspace-heading h1 { margin: 0; font-size: 30px; text-transform: capitalize; }
 .workspace-heading p { margin: 6px 0 0; color: var(--muted); text-transform: none; font-size: 13px; }
 .workspace-heading .eyebrow { display: none; }
+.workspace > header h1 { font-size: 30px; margin: 0; text-transform: capitalize; }
+.workspace > header p { margin: 6px 0 0; color: var(--muted); font-size: 13px; text-transform: none; }
+
+.icon-btn { border-radius: 12px; }
+.icon-btn:hover { background: var(--teal-100); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.header-icon { background: linear-gradient(135deg, var(--teal-50), var(--gold-100)); box-shadow: var(--shadow-sm); }
+
+.service-bar { gap: 22px; }
+.service-bar label { font-weight: 730; color: var(--navy-900); font-size: 13px; }
+.service-bar input {
+  min-height: 46px;
+  border-radius: 11px;
+  border: 1.5px solid #ccdcd2;
+  font-size: 14px;
+}
+.service-bar input:focus { border-color: var(--teal-500); box-shadow: var(--glow-teal); }
+.service-bar > div strong { font-size: 21px; color: var(--navy-950); letter-spacing: -.02em; }
+
+.counter-grid { gap: 18px; }
+.counter {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp .45s ease both;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.counter:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.counter svg { opacity: .85; }
+.counter button {
+  border-radius: 13px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  box-shadow: 0 10px 24px rgba(10, 46, 34, .18);
+  transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+}
+.counter button:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(10, 46, 34, .24); filter: brightness(1.05); }
+.counter button:active { transform: translateY(0) scale(.97); }
+.counter.new { background: linear-gradient(160deg, var(--green-soft), #fff 78%); }
+.counter.new button { background: linear-gradient(135deg, var(--green), #145c3d); }
+.counter.returning { background: linear-gradient(160deg, var(--blue-soft), #fff 78%); }
+.counter.returning button { background: linear-gradient(135deg, var(--blue), #1f5a80); }
+.counter.total { background: linear-gradient(160deg, var(--gold-100), #fff 78%); }
 .workspace-role-pill {
   margin-left: auto;
   padding: 7px 13px;
@@ -772,8 +816,9 @@ button:active:not(:disabled) { transform: scale(.97); }
 .admin-data-footer svg { color: var(--teal-600); }
 
 .counter strong { animation: popIn .28s cubic-bezier(.34, 1.56, .64, 1) both; }
-.counter { transition: transform var(--transition), box-shadow var(--transition); }
-.counter:hover { transform: translateY(-3px); }
+
+.modal-backdrop { animation: fadeInUp .2s ease both; }
+.modal { animation: popIn .3s cubic-bezier(.22, .8, .3, 1) both; }
 
 .notice { border-radius: 12px; font-size: 13px; animation: fadeInUp .3s ease both; }
 table { border-collapse: collapse; }
