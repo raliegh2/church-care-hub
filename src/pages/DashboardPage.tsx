@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { ArrowUpRight, CalendarCheck2, ContactRound, HandHeart, Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useCountUp } from '../lib/useCountUp';
 import type { AppRole, CareNote } from '../types';
 
 interface DashboardStats {
@@ -250,10 +251,11 @@ function Metric({
   detail: string;
   tone: 'green' | 'gold' | 'coral' | 'blue';
 }) {
+  const displayValue = useCountUp(value);
   return (
     <article className={`dashboard-metric ${tone}`}>
       <div><span>{label}</span><i /></div>
-      <strong>{value.toLocaleString()}</strong>
+      <strong>{displayValue.toLocaleString()}</strong>
       <small><CalendarCheck2 size={13} /> {detail}</small>
     </article>
   );

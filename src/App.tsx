@@ -14,7 +14,6 @@ import { PendingPage } from './pages/PendingPage';
 import { PeoplePage } from './pages/PeoplePage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import type { UserProfile } from './types';
-import './care-workspace.css';
 
 function timeoutAfter(milliseconds: number) {
   return new Promise<never>((_, reject) => {

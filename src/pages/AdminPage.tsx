@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useCountUp } from '../lib/useCountUp';
 import type { AppRole, UserProfile } from '../types';
 
 interface AdminMetrics {
@@ -221,10 +222,11 @@ function AdminMetric({
   detail: string;
   tone: 'green' | 'gold' | 'coral' | 'blue';
 }) {
+  const displayValue = useCountUp(value);
   return (
     <article className={`dashboard-metric ${tone}`}>
       <div><span>{label}</span><i /></div>
-      <strong>{value.toLocaleString()}</strong>
+      <strong>{displayValue.toLocaleString()}</strong>
       <small>{detail}</small>
     </article>
   );
