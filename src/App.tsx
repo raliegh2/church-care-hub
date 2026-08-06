@@ -115,7 +115,7 @@ export default function App() {
 
   return (
     <AppShell profile={profile} page={safePage} setPage={selectPage} signOut={() => void supabase.auth.signOut()}>
-      {safePage === 'dashboard' && <DashboardPage role={profile.role} />}
+      {safePage === 'dashboard' && <DashboardPage role={profile.role} onNavigate={selectPage} />}
       {safePage === 'attendance' && <AttendancePage userId={session.user.id} />}
       {safePage === 'visitors' && <PeoplePage type="visitor" userId={session.user.id} role={profile.role} />}
       {safePage === 'members' && <PeoplePage type="member" userId={session.user.id} role={profile.role} />}

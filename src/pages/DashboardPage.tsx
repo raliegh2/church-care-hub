@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { ArrowUpRight, CalendarCheck2, ContactRound, HandHeart, Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useCountUp } from '../lib/useCountUp';
+import type { AppPage } from '../lib/permissions';
 import type { AppRole, CareNote } from '../types';
 
 interface DashboardStats {
@@ -55,7 +56,7 @@ function priorityFor(noteType: string): PriorityItem['priority'] {
   return 'Low';
 }
 
-export function DashboardPage({ role }: { role: AppRole }) {
+export function DashboardPage({ role, onNavigate }: { role: AppRole; onNavigate: (page: AppPage) => void }) {
   const [stats, setStats] = useState<DashboardStats>(emptyStats);
   const [recentVisitors, setRecentVisitors] = useState<RecentVisitor[]>([]);
   const [weeklyCounts, setWeeklyCounts] = useState<number[]>(Array.from({ length: 8 }, () => 0));
@@ -152,9 +153,9 @@ export function DashboardPage({ role }: { role: AppRole }) {
     return (
       <section className="redesign-dashboard">
         <div className="dashboard-metric-grid three-up">
-          <Metric label="Visitors this month" value={stats.newVisitors} detail={`${stats.visitors} active visitor records`} tone="gold" />
-          <Metric label="First-time visitors" value={stats.newVisitors} detail="New records added this month" tone="green" />
-          <Metric label="Follow-up needed" value={stats.care} detail={`${stats.visits} visitor visits recorded`} tone="coral" />
+          <Metric label="Visitors this month" value={stats.newVisitors} detail={`${stats.visitors} active visitor records`} tone="gold" onClick={() => onNavigate('visitors')} />
+          <Metric label="First-time visitors" value={stats.newVisitors} detail="New records added this month" tone="green" onClick={() => onNavigate('visitors')} />
+          <Metric label="Follow-up needed" value={stats.care} detail={`${stats.visits} visitor visits recorded`} tone="coral" onClick={() => onNavigate('visitors')} />
         </div>
 
         <div className="dashboard-content-grid usher-grid">
@@ -175,11 +176,11 @@ export function DashboardPage({ role }: { role: AppRole }) {
             <div className="visitor-summary-table">
               <div className="visitor-summary-head"><span>Visitor</span><span>Visit date</span><span>Status</span></div>
               {recentVisitors.map(visitor => (
-                <div className="visitor-summary-row" key={visitor.id}>
+                <button className="visitor-summary-row" key={visitor.id} onClick={() => onNavigate('visitors')}>
                   <strong>{visitor.full_name}</strong>
                   <span>{new Date(`${visitor.first_visit_date}T00:00:00`).toLocaleDateString()}</span>
                   <em>First visit</em>
-                </div>
+                </button>
               ))}
               {recentVisitors.length === 0 && <div className="empty compact-empty">No visitor records yet.</div>}
             </div>
@@ -189,13 +190,15 @@ export function DashboardPage({ role }: { role: AppRole }) {
     );
   }
 
+  const nextFocus = priorityItems[0];
+
   return (
     <section className="redesign-dashboard">
       <div className="dashboard-metric-grid four-up">
-        <Metric label="Active members" value={stats.members} detail="Shared pastoral database" tone="green" />
-        <Metric label="Visitors this month" value={stats.newVisitors} detail={`${stats.visitors} active visitor records`} tone="gold" />
-        <Metric label="Open care needs" value={stats.care} detail="Across members and visitors" tone="coral" />
-        <Metric label="Visits completed" value={stats.visits} detail="Shared care history" tone="blue" />
+        <Metric label="Active members" value={stats.members} detail="Shared pastoral database" tone="green" onClick={() => onNavigate('members')} />
+        <Metric label="Visitors this month" value={stats.newVisitors} detail={`${stats.visitors} active visitor records`} tone="gold" onClick={() => onNavigate('visitors')} />
+        <Metric label="Open care needs" value={stats.care} detail="Across members and visitors" tone="coral" onClick={() => onNavigate('members')} />
+        <Metric label="Visits completed" value={stats.visits} detail="Shared care history" tone="blue" onClick={() => onNavigate('members')} />
       </div>
 
       <div className="dashboard-content-grid pastor-grid">
@@ -203,12 +206,12 @@ export function DashboardPage({ role }: { role: AppRole }) {
           <div className="panel-title-row"><div><h2>Care priority queue</h2><p>People with unresolved support needs.</p></div><HandHeart size={20} /></div>
           <div className="priority-list">
             {priorityItems.map(item => (
-              <div className="priority-row" key={item.id}>
+              <button className="priority-row" key={item.id} onClick={() => onNavigate(item.personType === 'Member' ? 'members' : 'visitors')}>
                 <span className={`person-avatar ${item.personType.toLowerCase()}`}>{item.name.slice(0, 1)}</span>
                 <span className="priority-person"><strong>{item.name}</strong><small>{item.personType}</small></span>
                 <span className="priority-need">{item.need}</span>
                 <em className={`priority-pill ${item.priority.toLowerCase()}`}>{item.priority}</em>
-              </div>
+              </button>
             ))}
             {priorityItems.length === 0 && <div className="empty compact-empty">No open care needs.</div>}
           </div>
@@ -222,18 +225,22 @@ export function DashboardPage({ role }: { role: AppRole }) {
                 <span>{stats.members + stats.newVisitors}</span>
               </div>
               <div className="community-legend">
-                <span><i className="member" /> Members <strong>{stats.members}</strong></span>
-                <span><i className="visitor" /> Visitors this month <strong>{stats.newVisitors}</strong></span>
+                <button onClick={() => onNavigate('members')}><i className="member" /> Members <strong>{stats.members}</strong></button>
+                <button onClick={() => onNavigate('visitors')}><i className="visitor" /> Visitors this month <strong>{stats.newVisitors}</strong></button>
               </div>
             </div>
           </article>
 
-          <article className="next-follow-up-card">
+          <button
+            className="next-follow-up-card"
+            disabled={!nextFocus}
+            onClick={() => nextFocus && onNavigate(nextFocus.personType === 'Member' ? 'members' : 'visitors')}
+          >
             <small>Next care focus</small>
-            <strong>{priorityItems[0]?.name || 'No urgent follow-up'}</strong>
-            <span>{priorityItems[0]?.need || 'All open needs have been resolved.'}</span>
+            <strong>{nextFocus?.name || 'No urgent follow-up'}</strong>
+            <span>{nextFocus?.need || 'All open needs have been resolved.'}</span>
             <ArrowUpRight size={18} />
-          </article>
+          </button>
         </aside>
       </div>
     </section>
@@ -245,18 +252,20 @@ function Metric({
   value,
   detail,
   tone,
+  onClick,
 }: {
   label: string;
   value: number;
   detail: string;
   tone: 'green' | 'gold' | 'coral' | 'blue';
+  onClick?: () => void;
 }) {
   const displayValue = useCountUp(value);
   return (
-    <article className={`dashboard-metric ${tone}`}>
+    <button className={`dashboard-metric ${tone}`} onClick={onClick}>
       <div><span>{label}</span><i /></div>
       <strong>{displayValue.toLocaleString()}</strong>
       <small><CalendarCheck2 size={13} /> {detail}</small>
-    </article>
+    </button>
   );
 }
