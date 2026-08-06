@@ -8,35 +8,29 @@
 .site-page > .center-screen,
 .site-page > .role-onboarding-page,
 .site-page > .app-shell {
-  min-height: calc(100vh - 78px);
+  min-height: calc(100vh - 54px);
 }
 
 .site-page > .app-shell .sidebar {
-  height: calc(100vh - 78px);
+  height: calc(100vh - 54px);
 }
 
 .site-credit {
-  min-height: 78px;
+  min-height: 54px;
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  padding: 14px 24px;
-  border-top: 1px solid var(--line, #d9e1e8);
-  background: rgba(255, 255, 255, .96);
-  color: var(--muted, #637487);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .025em;
+  padding: 8px 18px;
+  background: transparent;
   text-align: center;
 }
 
 .site-credit img {
   display: block;
-  width: 118px;
+  width: 82px;
   height: auto;
-  max-height: 48px;
+  max-height: 34px;
   object-fit: contain;
 }
 
@@ -45,7 +39,7 @@
   .site-page > .center-screen,
   .site-page > .role-onboarding-page,
   .site-page > .app-shell {
-    min-height: calc(100vh - 92px);
+    min-height: calc(100vh - 58px);
   }
 
   .site-page > .app-shell .sidebar {
@@ -53,14 +47,12 @@
   }
 
   .site-credit {
-    min-height: 92px;
-    flex-direction: column;
-    gap: 4px;
-    padding: 12px 18px;
+    min-height: 58px;
+    padding: 8px 14px;
   }
 
   .site-credit img {
-    width: 108px;
-    max-height: 42px;
+    width: 74px;
+    max-height: 30px;
   }
 }
