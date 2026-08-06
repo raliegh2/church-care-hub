@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { AppShell } from './components/AppShell';
 import { Loading } from './components/Loading';
+import { SiteCredit } from './components/SiteCredit';
 import { canAccessPage, type AppPage } from './lib/permissions';
 import { supabase } from './lib/supabase';
 import { AdminPage } from './pages/AdminPage';
@@ -19,6 +20,15 @@ function timeoutAfter(milliseconds: number) {
   return new Promise<never>((_, reject) => {
     window.setTimeout(() => reject(new Error('Request timed out')), milliseconds);
   });
+}
+
+function SitePage({ children }: { children: ReactNode }) {
+  return (
+    <div className="site-page">
+      {children}
+      <SiteCredit />
+    </div>
+  );
 }
 
 export default function App() {
@@ -93,19 +103,21 @@ export default function App() {
     if (profile && !canAccessPage(profile.role, page)) setPage('dashboard');
   }, [page, profile]);
 
-  if (loading) return <Loading />;
-  if (!session) return <AuthPage />;
-  if (recovering) return <ResetPasswordPage onDone={() => setRecovering(false)} />;
+  if (loading) return <SitePage><Loading /></SitePage>;
+  if (!session) return <SitePage><AuthPage /></SitePage>;
+  if (recovering) return <SitePage><ResetPasswordPage onDone={() => setRecovering(false)} /></SitePage>;
   if (!profile) {
     return (
-      <OnboardingPage
-        defaultName={String(session.user.user_metadata.display_name || '')}
-        onDone={() => loadProfile(session)}
-      />
+      <SitePage>
+        <OnboardingPage
+          defaultName={String(session.user.user_metadata.display_name || '')}
+          onDone={() => loadProfile(session)}
+        />
+      </SitePage>
     );
   }
   if (!profile.active || profile.role_status !== 'approved') {
-    return <PendingPage status={profile.role_status} active={profile.active} />;
+    return <SitePage><PendingPage status={profile.role_status} active={profile.active} /></SitePage>;
   }
 
   const safePage = canAccessPage(profile.role, page) ? page : 'dashboard';
@@ -114,13 +126,15 @@ export default function App() {
   };
 
   return (
-    <AppShell profile={profile} page={safePage} setPage={selectPage} signOut={() => void supabase.auth.signOut()}>
-      {safePage === 'dashboard' && <DashboardPage role={profile.role} onNavigate={selectPage} />}
-      {safePage === 'attendance' && <AttendancePage userId={session.user.id} />}
-      {safePage === 'visitors' && <PeoplePage type="visitor" userId={session.user.id} role={profile.role} />}
-      {safePage === 'members' && <PeoplePage type="member" userId={session.user.id} role={profile.role} />}
-      {safePage === 'import' && <ImportPage userId={session.user.id} />}
-      {safePage === 'admin' && <AdminPage userId={session.user.id} />}
-    </AppShell>
+    <SitePage>
+      <AppShell profile={profile} page={safePage} setPage={selectPage} signOut={() => void supabase.auth.signOut()}>
+        {safePage === 'dashboard' && <DashboardPage role={profile.role} onNavigate={selectPage} />}
+        {safePage === 'attendance' && <AttendancePage userId={session.user.id} />}
+        {safePage === 'visitors' && <PeoplePage type="visitor" userId={session.user.id} role={profile.role} />}
+        {safePage === 'members' && <PeoplePage type="member" userId={session.user.id} role={profile.role} />}
+        {safePage === 'import' && <ImportPage userId={session.user.id} />}
+        {safePage === 'admin' && <AdminPage userId={session.user.id} />}
+      </AppShell>
+    </SitePage>
   );
 }
