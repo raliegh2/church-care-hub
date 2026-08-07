@@ -154,7 +154,7 @@ p { line-height: 1.55; }
   display: flex;
   align-items: center;
   background:
-    radial-gradient(circle at 78% 13%, rgba(234, 179, 8, .28), transparent 29%),
+    radial-gradient(circle at 78% 13%, rgba(234, 179, 8, .14), transparent 22%),
     radial-gradient(circle at 12% 92%, rgba(201, 151, 63, .16), transparent 25%),
     linear-gradient(138deg, var(--navy-950), var(--navy-800));
   color: #fff;
@@ -283,7 +283,7 @@ p { line-height: 1.55; }
   border-radius: var(--radius-lg);
   padding: clamp(28px, 4vw, 42px);
   background:
-    radial-gradient(circle at 88% 15%, rgba(234, 179, 8, .26), transparent 30%),
+    radial-gradient(circle at 88% 15%, rgba(234, 179, 8, .14), transparent 22%),
     linear-gradient(135deg, var(--navy-950), var(--navy-800));
   color: #fff;
   box-shadow: var(--shadow);

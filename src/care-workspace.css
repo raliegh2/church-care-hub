@@ -130,8 +130,8 @@ button:active:not(:disabled) { transform: scale(.97); }
   display: flex;
   align-items: stretch;
   background:
-    radial-gradient(circle at 85% 8%, rgba(234, 179, 8, .35), transparent 30%),
-    radial-gradient(circle at 5% 95%, rgba(224, 165, 46, .22), transparent 26%),
+    radial-gradient(circle at 85% 8%, rgba(234, 179, 8, .16), transparent 22%),
+    radial-gradient(circle at 5% 95%, rgba(224, 165, 46, .1), transparent 18%),
     linear-gradient(150deg, var(--navy-950), var(--navy-800) 70%);
   color: #fff;
   overflow: hidden;
@@ -157,7 +157,7 @@ button:active:not(:disabled) { transform: scale(.97); }
   left: -110px;
   bottom: -110px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(224, 165, 46, .28), transparent 70%);
+  background: radial-gradient(circle, rgba(224, 165, 46, .14), transparent 70%);
   filter: blur(2px);
   animation: floatGlow 11s ease-in-out infinite reverse;
 }
@@ -201,7 +201,7 @@ button:active:not(:disabled) { transform: scale(.97); }
   padding: 20px 22px;
   max-width: 400px;
   border-radius: 14px;
-  background: rgba(234, 179, 8, .14);
+  background: rgba(255, 255, 255, .08);
   border: 1px solid rgba(255, 255, 255, .12);
   backdrop-filter: blur(6px);
   animation: fadeInUp .7s .18s ease both;
@@ -343,9 +343,9 @@ button:active:not(:disabled) { transform: scale(.97); }
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, var(--teal-500), var(--navy-800));
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(10, 46, 34, .3);
+  background: linear-gradient(135deg, var(--teal-500), var(--teal-700));
+  color: var(--navy-950);
+  box-shadow: 0 8px 20px rgba(138, 101, 8, .3);
 }
 .role-choice-icon svg { width: 20px; }
 .role-choice-icon.pastor { background: linear-gradient(135deg, var(--gold-500), var(--gold-600)); box-shadow: 0 8px 20px rgba(201, 138, 31, .32); }
@@ -384,9 +384,7 @@ button:active:not(:disabled) { transform: scale(.97); }
 .sidebar {
   width: 252px;
   padding: 26px 17px 20px;
-  background:
-    radial-gradient(circle at 20% 0%, rgba(234, 179, 8, .22), transparent 60%),
-    linear-gradient(185deg, var(--navy-950), var(--navy-900) 60%, #0b3122 100%);
+  background: linear-gradient(185deg, var(--navy-950), var(--navy-900) 60%, #0b3122 100%);
   box-shadow: 10px 0 30px rgba(8, 38, 28, .12);
 }
 .sidebar .brand { padding: 0 6px 26px; }
@@ -420,8 +418,9 @@ button:active:not(:disabled) { transform: scale(.97); }
   margin-bottom: 11px;
   padding: 13px 14px;
   border-radius: 12px;
-  background: linear-gradient(120deg, rgba(234, 179, 8, .22), rgba(224, 165, 46, .14));
+  background: rgba(255, 255, 255, .06);
   border: 1px solid rgba(255, 255, 255, .08);
+  border-left: 3px solid var(--teal-500);
 }
 .sidebar-role-card small,
 .sidebar-role-card strong,
@@ -703,7 +702,7 @@ button.dashboard-metric:active { transform: translateY(-1px) scale(.99); }
   border: 0;
   border-radius: var(--radius);
   background:
-    radial-gradient(circle at 90% 0%, rgba(224, 165, 46, .3), transparent 60%),
+    radial-gradient(circle at 90% 0%, rgba(224, 165, 46, .14), transparent 40%),
     linear-gradient(135deg, var(--navy-950), var(--navy-800));
   color: #fff;
   text-align: left;
