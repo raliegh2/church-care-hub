@@ -38,11 +38,11 @@
   --red: #a33a43;
   --red-soft: #fff0f1;
   --radius-sm: 11px;
-  --radius: 16px;
-  --radius-lg: 22px;
-  --shadow-sm: 0 2px 8px rgba(7, 26, 43, .05);
-  --shadow: 0 16px 42px rgba(7, 26, 43, .09);
-  --shadow-lg: 0 28px 80px rgba(7, 26, 43, .16);
+  --radius: 18px;
+  --radius-lg: 28px;
+  --shadow-sm: 0 2px 10px rgba(10, 46, 34, .06), inset 0 1px 0 rgba(255, 255, 255, .55);
+  --shadow: 0 24px 56px rgba(10, 46, 34, .11), inset 0 1px 0 rgba(255, 255, 255, .4);
+  --shadow-lg: 0 36px 90px rgba(10, 46, 34, .2), inset 0 1px 0 rgba(255, 255, 255, .3);
   --transition: 160ms cubic-bezier(.2, .75, .3, 1);
 }
 
