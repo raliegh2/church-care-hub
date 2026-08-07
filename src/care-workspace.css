@@ -861,6 +861,12 @@ button.dashboard-metric:active { transform: translateY(-1px) scale(.99); }
 .admin-data-footer span:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
 .admin-data-footer svg { color: var(--teal-600); }
 
+.counter strong,
+.dashboard-metric > strong,
+.status-card strong,
+.service-bar > div strong,
+.community-ring span { font-variant-numeric: tabular-nums; }
+
 .counter strong { animation: popIn .28s cubic-bezier(.34, 1.56, .64, 1) both; }
 
 .modal-backdrop { animation: fadeInUp .2s ease both; }
