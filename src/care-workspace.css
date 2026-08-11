@@ -949,3 +949,130 @@ td { font-size: 12px; }
     animation: none !important;
   }
 }
+
+/* Light, high-legibility theme refinements. */
+body {
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 85% -6%, rgba(234, 179, 8, .08), transparent 32rem),
+    radial-gradient(circle at -6% 108%, rgba(83, 142, 105, .07), transparent 30rem),
+    #f8fbf9;
+}
+
+input,
+select,
+textarea,
+.search {
+  background: #fff;
+  color: #142a21;
+  border-color: #c8d9cf;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6e8077;
+  opacity: 1;
+}
+
+.auth-layout,
+.auth-panel {
+  background: #fbfdfc;
+}
+
+.auth-visual {
+  background:
+    radial-gradient(circle at 85% 8%, rgba(234, 179, 8, .18), transparent 24%),
+    radial-gradient(circle at 5% 95%, rgba(83, 142, 105, .13), transparent 23%),
+    linear-gradient(145deg, #eef8f1, #fffaf0);
+  color: var(--navy-950);
+}
+
+.auth-visual .brand strong,
+.auth-visual h2,
+.auth-visual blockquote strong {
+  color: var(--navy-950);
+}
+
+.auth-visual .brand small,
+.auth-visual p,
+.auth-visual blockquote span {
+  color: #526b60;
+}
+
+.auth-visual blockquote {
+  background: rgba(255, 255, 255, .82);
+  border-color: #d8e7de;
+  box-shadow: var(--shadow-sm);
+}
+
+.auth-visual::after { border-color: rgba(83, 142, 105, .16); }
+
+.sidebar {
+  background: linear-gradient(180deg, #f4faf6, #e9f3ed);
+  color: var(--navy-950);
+  border-right: 1px solid #d8e6dd;
+  box-shadow: 8px 0 28px rgba(31, 74, 52, .06);
+}
+
+.sidebar .brand strong,
+.sidebar-role-card strong,
+.user-chip strong {
+  color: var(--navy-950);
+}
+
+.sidebar .brand small,
+.sidebar-role-card small,
+.user-chip small {
+  color: #60766b;
+}
+
+.sidebar nav button,
+.sidebar-footer button {
+  color: #355447;
+}
+
+.sidebar nav button:hover,
+.sidebar-footer button:hover {
+  background: #dcebe2;
+  color: var(--navy-950);
+}
+
+.sidebar nav button.active {
+  background: #fff3c7;
+  color: #3d3210;
+  border: 1px solid #efd67c;
+  box-shadow: 0 7px 18px rgba(138, 101, 8, .12);
+}
+
+.sidebar-footer { border-top-color: #d5e3da; }
+
+.sidebar-role-card {
+  background: rgba(255, 255, 255, .78);
+  border-color: #d5e3da;
+  border-left-color: var(--teal-500);
+}
+
+.sidebar-close { color: var(--navy-950); }
+
+.panel,
+.dashboard-metric,
+.auth-card,
+.role-choice-grid > button,
+.rows > button,
+.admin-row,
+.modal,
+.status-card {
+  color: var(--ink);
+  background-color: #fff;
+}
+
+.next-follow-up-card {
+  background:
+    radial-gradient(circle at 90% 0%, rgba(224, 165, 46, .16), transparent 42%),
+    linear-gradient(145deg, #f1f8f3, #fffaf0);
+  color: var(--navy-950);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+.next-follow-up-card span { color: #5d7167; }
