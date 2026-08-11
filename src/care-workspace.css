@@ -1076,3 +1076,103 @@ textarea::placeholder {
 }
 
 .next-follow-up-card span { color: #5d7167; }
+
+/* Readability pass: larger type and visibly brighter content surfaces. */
+:root {
+  --muted: #496258;
+  --line: #cadbd1;
+  --line-strong: #adc8b8;
+  --background: #f7fbf8;
+  --surface-subtle: #f1f7f3;
+  --shadow-sm: 0 4px 14px rgba(31, 74, 52, .055);
+  --shadow: 0 14px 34px rgba(31, 74, 52, .075);
+  --shadow-lg: 0 22px 52px rgba(31, 74, 52, .1);
+}
+
+.auth-layout,
+.auth-panel { background: #f8fcf9; }
+
+.auth-card {
+  width: min(540px, 100%);
+  padding: 46px;
+  border-color: #bfd3c7;
+  box-shadow: 0 20px 48px rgba(31, 74, 52, .1);
+}
+
+.auth-card-header h1 { font-size: 36px; }
+.auth-card-header p { font-size: 16px; color: #4b6358; }
+.auth-card label { font-size: 15px; color: #1c3429; }
+.auth-card input {
+  min-height: 54px;
+  padding: 14px 16px;
+  font-size: 16px;
+  border-width: 2px;
+}
+.auth-inline-action,
+.auth-inline-action .text-btn,
+.auth-switch,
+.auth-switch .text-btn { font-size: 14px; }
+.auth-submit { min-height: 52px; font-size: 16px; }
+
+.sidebar nav button,
+.sidebar-footer button { font-size: 14px; font-weight: 720; }
+.sidebar-role-card strong,
+.user-chip strong { font-size: 14px; }
+.sidebar-role-card small,
+.user-chip small { font-size: 11px; }
+
+.workspace-heading h1,
+.workspace > header h1 { font-size: 36px; }
+.workspace-heading p,
+.workspace > header p { font-size: 15px; color: #486156; }
+
+.panel,
+.dashboard-metric,
+.auth-card,
+.role-choice-grid > button,
+.rows > button,
+.admin-row,
+.modal,
+.status-card { border-width: 1.5px; }
+
+.panel-title-row h2,
+.section-heading h2 { font-size: 20px; }
+.panel-title-row p,
+.section-heading p { font-size: 14px; color: #4b6358; }
+
+.dashboard-metric { min-height: 150px; padding: 26px 24px; }
+.dashboard-metric:nth-child(1) { background: #f2faf5; }
+.dashboard-metric:nth-child(2) { background: #fffaf0; }
+.dashboard-metric:nth-child(3) { background: #fff6f4; }
+.dashboard-metric:nth-child(4) { background: #f2f8fc; }
+.dashboard-metric small,
+.dashboard-metric span,
+.priority-row small,
+.status-card small,
+.rows small,
+.admin-row small { font-size: 12px; color: #526b60; }
+.dashboard-metric strong { font-size: clamp(2.25rem, 4vw, 2.7rem); }
+
+.rows > button,
+.admin-row,
+.priority-row { font-size: 14px; }
+
+.care-entry input,
+.care-entry select,
+.care-entry textarea,
+.person-form-modal input,
+.person-form-modal select,
+.admin-access-table select,
+.service-bar input,
+.search input { min-height: 48px; font-size: 15px; }
+
+th { font-size: 13px; }
+td { font-size: 14px; }
+.workspace-role-pill { font-size: 12px; padding: 9px 15px; }
+
+@media (max-width: 620px) {
+  .auth-card { padding: 32px 24px; }
+  .auth-card-header h1 { font-size: 31px; }
+  .workspace-heading h1,
+  .workspace > header h1 { font-size: 28px; }
+}
