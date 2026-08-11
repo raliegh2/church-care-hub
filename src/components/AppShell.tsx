@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import {
+  Cake,
   ClipboardCheck,
   ContactRound,
   FileUp,
@@ -39,6 +40,7 @@ function pageDescription(role: AppRole, page: AppPage): string {
   }
   if (page === 'visitors') return 'Manage visitor profiles, visits and support follow-up.';
   if (page === 'members') return 'Review member records, care history and pastoral support.';
+  if (page === 'birthdays') return 'See the next member birthday and the full annual birthday pipeline.';
   if (page === 'attendance') return 'Record service attendance and visitor totals.';
   if (page === 'import') return 'Upload, validate and import member records safely.';
   return 'Approve roles, maintain access and monitor the full care system.';
@@ -73,6 +75,7 @@ export function AppShell({
   }
   if (canViewMembers(role)) {
     items.push({ key: 'members', label: 'Member care', icon: <Users size={18} /> });
+    items.push({ key: 'birthdays', label: 'Birthdays', icon: <Cake size={18} /> });
   }
   if (canImportMembers(role)) {
     items.push({ key: 'import', label: 'Import members', icon: <FileUp size={18} /> });

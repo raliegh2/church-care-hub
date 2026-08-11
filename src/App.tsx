@@ -8,6 +8,7 @@ import { supabase } from './lib/supabase';
 import { AdminPage } from './pages/AdminPage';
 import { AttendancePage } from './pages/AttendancePage';
 import { AuthPage } from './pages/AuthPage';
+import { BirthdaysPage } from './pages/BirthdaysPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ImportPage } from './pages/ImportPage';
 import { OnboardingPage } from './pages/OnboardingPage';
@@ -132,6 +133,7 @@ export default function App() {
         {safePage === 'attendance' && <AttendancePage userId={session.user.id} />}
         {safePage === 'visitors' && <PeoplePage type="visitor" userId={session.user.id} role={profile.role} />}
         {safePage === 'members' && <PeoplePage type="member" userId={session.user.id} role={profile.role} />}
+        {safePage === 'birthdays' && <BirthdaysPage />}
         {safePage === 'import' && <ImportPage userId={session.user.id} />}
         {safePage === 'admin' && <AdminPage userId={session.user.id} />}
       </AppShell>

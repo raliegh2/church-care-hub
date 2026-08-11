@@ -1,6 +1,6 @@
 import type { AppRole } from '../types';
 
-export type AppPage = 'dashboard' | 'attendance' | 'visitors' | 'members' | 'import' | 'admin';
+export type AppPage = 'dashboard' | 'attendance' | 'visitors' | 'members' | 'birthdays' | 'import' | 'admin';
 
 export const canManageAttendance = (role: AppRole) => role === 'pastor' || role === 'administrator';
 export const canManageVisitors = (role: AppRole) => role === 'usher' || role === 'pastor' || role === 'administrator';
@@ -13,6 +13,7 @@ export function canAccessPage(role: AppRole, page: AppPage): boolean {
   if (page === 'attendance') return canManageAttendance(role);
   if (page === 'visitors') return canManageVisitors(role);
   if (page === 'members') return canViewMembers(role);
+  if (page === 'birthdays') return canViewMembers(role);
   if (page === 'import') return canImportMembers(role);
   return canAdminister(role);
 }

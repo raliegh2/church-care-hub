@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
-import { ArrowUpRight, CalendarCheck2, ContactRound, HandHeart, Users } from 'lucide-react';
+import { ArrowUpRight, Cake, CalendarCheck2, ContactRound, HandHeart, Users } from 'lucide-react';
+import { formatBirthday, getBirthdayPipeline, memberName, type MemberBirthday } from '../lib/birthdays';
 import { supabase } from '../lib/supabase';
 import { useCountUp } from '../lib/useCountUp';
 import type { AppPage } from '../lib/permissions';
-import type { AppRole, CareNote } from '../types';
+import type { AppRole, CareNote, Member } from '../types';
 
 interface DashboardStats {
   visitors: number;
@@ -61,6 +62,23 @@ export function DashboardPage({ role, onNavigate }: { role: AppRole; onNavigate:
   const [recentVisitors, setRecentVisitors] = useState<RecentVisitor[]>([]);
   const [weeklyCounts, setWeeklyCounts] = useState<number[]>(Array.from({ length: 8 }, () => 0));
   const [priorityItems, setPriorityItems] = useState<PriorityItem[]>([]);
+  const [nextBirthday, setNextBirthday] = useState<MemberBirthday | null>(null);
+
+  useEffect(() => {
+    if (role === 'usher') {
+      setNextBirthday(null);
+      return;
+    }
+    let active = true;
+    void supabase.from('members')
+      .select('id,organization_id,first_name,last_name,birth_date,active,created_by,created_at')
+      .eq('active', true)
+      .not('birth_date', 'is', null)
+      .then(({ data }) => {
+        if (active) setNextBirthday(getBirthdayPipeline((data || []) as Member[]).next);
+      });
+    return () => { active = false; };
+  }, [role]);
 
   useEffect(() => {
     let active = true;
@@ -218,6 +236,13 @@ export function DashboardPage({ role, onNavigate }: { role: AppRole; onNavigate:
         </article>
 
         <aside className="dashboard-side-stack">
+          <button className="dashboard-birthday-card" onClick={() => onNavigate('birthdays')}>
+            <Cake size={20} />
+            <small>Next member birthday</small>
+            <strong>{nextBirthday ? memberName(nextBirthday.member) : 'No birthdays recorded'}</strong>
+            <span>{nextBirthday ? `${formatBirthday(nextBirthday.occurrence)} · ${nextBirthday.daysAway === 0 ? 'Today' : `in ${nextBirthday.daysAway} day${nextBirthday.daysAway === 1 ? '' : 's'}`}` : 'Add dates from Member care.'}</span>
+            <ArrowUpRight size={18} />
+          </button>
           <article className="panel community-mix-card">
             <div className="panel-title-row"><div><h2>Community mix</h2><p>Current people records.</p></div><Users size={20} /></div>
             <div className="community-mix-body">

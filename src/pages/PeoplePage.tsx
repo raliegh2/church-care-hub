@@ -271,6 +271,7 @@ function PersonDetail({
       <div className="person-facts">
         {member?.address && <span><MapPin size={16} /> {member.address}</span>}
         {member?.ministry && <span>Ministry: {member.ministry}</span>}
+        {member?.birth_date && <span>Birthday: {new Date(`${member.birth_date}T00:00:00`).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span>}
         {member?.joined_date && <span>Joined: {new Date(`${member.joined_date}T00:00:00`).toLocaleDateString()}</span>}
         {visitor && <span>First visit: {new Date(`${visitor.first_visit_date}T00:00:00`).toLocaleDateString()}</span>}
         {visitor && <span>Contact consent: {visitor.contact_consent ? 'Yes' : 'No'}</span>}
@@ -378,6 +379,7 @@ function PersonForm({
       address: text('address'),
       ministry: text('ministry'),
       joined_date: text('joined_date'),
+      birth_date: text('birth_date'),
       active: true,
     };
 
@@ -411,7 +413,8 @@ function PersonForm({
             <div className="form-grid"><label>First name<input name="first_name" defaultValue={member?.first_name || ''} maxLength={100} required /></label><label>Last name<input name="last_name" defaultValue={member?.last_name || ''} maxLength={100} required /></label></div>
             <div className="form-grid"><label>Email<input name="email" type="email" defaultValue={member?.email || ''} maxLength={254} /></label><label>Phone<input name="phone" defaultValue={member?.phone || ''} maxLength={50} /></label></div>
             <label>Address<input name="address" defaultValue={member?.address || ''} maxLength={500} /></label>
-            <div className="form-grid"><label>Ministry<input name="ministry" defaultValue={member?.ministry || ''} maxLength={100} /></label><label>Date joined<input name="joined_date" type="date" defaultValue={member?.joined_date || ''} /></label></div>
+            <div className="form-grid"><label>Date of birth<input name="birth_date" type="date" defaultValue={member?.birth_date || ''} /></label><label>Date joined<input name="joined_date" type="date" defaultValue={member?.joined_date || ''} /></label></div>
+            <label>Ministry<input name="ministry" defaultValue={member?.ministry || ''} maxLength={100} /></label>
           </>
         )}
         <div className="action-row"><button type="button" className="secondary" onClick={close}>Cancel</button><button className="primary" disabled={busy}>{busy ? 'Saving…' : 'Save record'}</button></div>

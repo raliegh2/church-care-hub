@@ -35,6 +35,7 @@ export interface Member {
   address?: string | null;
   ministry?: string | null;
   joined_date?: string | null;
+  birth_date?: string | null;
   membership_status?: string;
   last_contact_at?: string | null;
   active: boolean;
