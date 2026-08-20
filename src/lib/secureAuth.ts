@@ -9,11 +9,14 @@ interface SecureLoginResponse {
 
 export class SecureLoginError extends Error {
   readonly retryAfterSeconds: number;
+  /** HTTP status from the sign-in service; 0 when it could not be reached. */
+  readonly status: number;
 
-  constructor(message: string, retryAfterSeconds = 0) {
+  constructor(message: string, retryAfterSeconds = 0, status = 0) {
     super(message);
     this.name = 'SecureLoginError';
     this.retryAfterSeconds = retryAfterSeconds;
+    this.status = status;
   }
 }
 
@@ -54,7 +57,7 @@ export async function secureSignIn(email: string, password: string): Promise<voi
       : response.status === 401
         ? 'The email or password is incorrect.'
         : 'Sign-in is temporarily unavailable. Please try again.';
-    throw new SecureLoginError(message, retryAfterSeconds);
+    throw new SecureLoginError(message, retryAfterSeconds, response.status);
   }
 
   const { error } = await supabase.auth.setSession({

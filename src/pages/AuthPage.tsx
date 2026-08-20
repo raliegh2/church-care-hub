@@ -16,6 +16,9 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
   const [isError, setIsError] = useState(notice?.isError ?? false);
   const [busy, setBusy] = useState(false);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  // Shown after any failed sign-in, never conditioned on whether the account
+  // exists, so it cannot be used to probe for registered addresses.
+  const [showSetupHint, setShowSetupHint] = useState(false);
 
   // Recovery ends by signing out and returning here, so the outcome of the
   // reset has to be shown on this screen rather than the one that is going away.
@@ -39,6 +42,7 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
 
     setMessage('');
     setIsError(false);
+    setShowSetupHint(false);
     const form = new FormData(e.currentTarget);
     const normalizedEmail = email.trim().toLowerCase();
     const password = String(form.get('password'));
@@ -77,7 +81,16 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
       setIsError(true);
       if (error instanceof SecureLoginError) {
         setMessage(error.message);
-        if (error.retryAfterSeconds > 0) setCooldownSeconds(error.retryAfterSeconds);
+        if (error.retryAfterSeconds > 0) {
+          setCooldownSeconds(error.retryAfterSeconds);
+        } else if (!signup && error.status === 401) {
+          // A rejected credential is indistinguishable from an account that was
+          // never set up on this site, or one whose email was never confirmed.
+          // Point at the route that resolves all three rather than leaving
+          // people to re-type a password that was never going to work. Gated on
+          // 401 so a service outage does not send anyone into a password reset.
+          setShowSetupHint(true);
+        }
       } else {
         setMessage('Sign-in is temporarily unavailable. Please try again.');
       }
@@ -149,6 +162,13 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
             </div>
           )}
 
+          {showSetupHint && (
+            <div className="notice" role="status" aria-live="polite">
+              If you have not signed in on this site before, or never confirmed your email,
+              use “Forgot password?” below to set the password for this account.
+            </div>
+          )}
+
           <form onSubmit={submit}>
             {signup && (
               <label>
@@ -203,6 +223,7 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
                 setMessage('');
                 setIsError(false);
                 setCooldownSeconds(0);
+                setShowSetupHint(false);
               }}
             >
               {signup ? 'Sign in' : 'Create an account and choose your role'}
