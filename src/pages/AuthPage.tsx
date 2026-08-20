@@ -3,13 +3,27 @@ import { Brand } from '../components/Brand';
 import { secureSignIn, SecureLoginError } from '../lib/secureAuth';
 import { canonicalAppOrigin, supabase } from '../lib/supabase';
 
-export function AuthPage() {
+/** A message carried over from a finished password recovery or a failed link. */
+export interface AuthNotice {
+  text: string;
+  isError: boolean;
+}
+
+export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
   const [signup, setSignup] = useState(false);
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [isError, setIsError] = useState(false);
+  const [message, setMessage] = useState(notice?.text ?? '');
+  const [isError, setIsError] = useState(notice?.isError ?? false);
   const [busy, setBusy] = useState(false);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
+
+  // Recovery ends by signing out and returning here, so the outcome of the
+  // reset has to be shown on this screen rather than the one that is going away.
+  useEffect(() => {
+    if (!notice) return;
+    setMessage(notice.text);
+    setIsError(notice.isError);
+  }, [notice]);
 
   useEffect(() => {
     if (cooldownSeconds <= 0) return;
@@ -129,7 +143,11 @@ export function AuthPage() {
             <p>{signup ? 'Create an account, then choose the ministry role you serve in.' : 'Sign in to continue caring for your church community.'}</p>
           </div>
 
-          {message && <div className={`notice${isError ? ' error' : ''}`}>{message}</div>}
+          {message && (
+            <div className={`notice${isError ? ' error' : ''}`} role={isError ? 'alert' : 'status'} aria-live="polite">
+              {message}
+            </div>
+          )}
 
           <form onSubmit={submit}>
             {signup && (

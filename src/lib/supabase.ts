@@ -1,3 +1,7 @@
+// Imported first, and only for its side effect: it records what the Supabase
+// email link said before `createClient` below consumes and erases the URL
+// fragment that carries it.
+import './authCallback';
 import { createClient } from '@supabase/supabase-js';
 
 export const canonicalAppOrigin = 'https://church-care-hub.vercel.app';
