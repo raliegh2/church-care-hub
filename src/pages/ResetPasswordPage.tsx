@@ -3,6 +3,12 @@ import type { AuthError } from '@supabase/supabase-js';
 import { Brand } from '../components/Brand';
 import { supabase } from '../lib/supabase';
 import { clearLoginThrottleForPasswordReset } from '../lib/secureAuth';
+import {
+  isPasswordPolicyError,
+  meetsPasswordPolicy,
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_REQUIREMENTS,
+} from '../lib/passwordPolicy';
 
 /**
  * A recovery session is short-lived, so somebody who opens the link and then
@@ -34,8 +40,8 @@ export function ResetPasswordPage({
       setMessage('The passwords do not match.');
       return;
     }
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(password)) {
-      setMessage('Use at least 8 characters with an uppercase letter, lowercase letter, number, and symbol.');
+    if (!meetsPasswordPolicy(password)) {
+      setMessage(PASSWORD_REQUIREMENTS);
       return;
     }
 
@@ -55,7 +61,7 @@ export function ResetPasswordPage({
         );
         return;
       }
-      setMessage(error.message);
+      setMessage(isPasswordPolicyError(error) ? PASSWORD_REQUIREMENTS : error.message);
       return;
     }
 
@@ -73,12 +79,12 @@ export function ResetPasswordPage({
         <form onSubmit={submit}>
           <label>
             New password
-            <input name="password" type="password" minLength={8} autoComplete="new-password" required />
-            <small>8+ characters with uppercase, lowercase, number, and symbol.</small>
+            <input name="password" type="password" minLength={MIN_PASSWORD_LENGTH} autoComplete="new-password" required />
+            <small>11+ characters with uppercase, lowercase, number, and symbol.</small>
           </label>
           <label>
             Confirm new password
-            <input name="confirmation" type="password" minLength={8} autoComplete="new-password" required />
+            <input name="confirmation" type="password" minLength={MIN_PASSWORD_LENGTH} autoComplete="new-password" required />
           </label>
           <button className="primary" disabled={busy}>{busy ? 'Saving…' : 'Update password'}</button>
         </form>

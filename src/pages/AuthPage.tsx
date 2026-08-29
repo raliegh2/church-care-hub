@@ -2,6 +2,12 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Brand } from '../components/Brand';
 import { secureSignIn, SecureLoginError } from '../lib/secureAuth';
 import { canonicalAppOrigin, supabase } from '../lib/supabase';
+import {
+  isPasswordPolicyError,
+  meetsPasswordPolicy,
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_REQUIREMENTS,
+} from '../lib/passwordPolicy';
 
 /** A message carried over from a finished password recovery or a failed link. */
 export interface AuthNotice {
@@ -48,9 +54,9 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
     const password = String(form.get('password'));
     const name = String(form.get('name') || '').trim();
 
-    if (signup && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(password)) {
+    if (signup && !meetsPasswordPolicy(password)) {
       setIsError(true);
-      setMessage('Use at least 8 characters with an uppercase letter, lowercase letter, number, and symbol.');
+      setMessage(PASSWORD_REQUIREMENTS);
       return;
     }
 
@@ -68,9 +74,13 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
 
         if (error) {
           setIsError(true);
-          setMessage(error.status === 429
-            ? 'Too many account requests. Please wait before trying again.'
-            : 'The account could not be created. Check the details and try again.');
+          setMessage(
+            error.status === 429
+              ? 'Too many account requests. Please wait before trying again.'
+              : isPasswordPolicyError(error)
+                ? PASSWORD_REQUIREMENTS
+                : 'The account could not be created. Check the details and try again.',
+          );
         } else if (!data.session) {
           setMessage('Check your email to confirm your account. If you already registered, use “Forgot password?” instead.');
         }
@@ -193,12 +203,12 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
               <input
                 name="password"
                 type="password"
-                minLength={signup ? 8 : 6}
+                minLength={signup ? MIN_PASSWORD_LENGTH : 6}
                 autoComplete={signup ? 'new-password' : 'current-password'}
                 placeholder={signup ? 'Create a secure password' : 'Enter your password'}
                 required
               />
-              {signup && <small>8+ characters with uppercase, lowercase, number and symbol.</small>}
+              {signup && <small>11+ characters with uppercase, lowercase, number and symbol.</small>}
             </label>
 
             {!signup && (
