@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-11T14:36:11.517Z",
+  "title": "Design System: Church Care Hub",
+  "extensions": {
+    "colorMeta": {
+      "evergreen-deep": {
+        "role": "primary",
+        "displayName": "Deep Evergreen",
+        "canonical": "#123d2c",
+        "tonalRamp": ["oklch(15% 0.057 163.8)", "oklch(25% 0.057 163.8)", "oklch(35% 0.057 163.8)", "oklch(45% 0.057 163.8)", "oklch(55% 0.057 163.8)", "oklch(67% 0.057 163.8)", "oklch(82% 0.057 163.8)", "oklch(95% 0.057 163.8)"]
+      },
+      "evergreen-action": {
+        "role": "primary",
+        "displayName": "Action Evergreen",
+        "canonical": "#245b43",
+        "tonalRamp": ["oklch(15% 0.071 162.3)", "oklch(25% 0.071 162.3)", "oklch(35% 0.071 162.3)", "oklch(45% 0.071 162.3)", "oklch(55% 0.071 162.3)", "oklch(67% 0.071 162.3)", "oklch(82% 0.071 162.3)", "oklch(95% 0.071 162.3)"]
+      },
+      "evergreen-soft": {
+        "role": "primary",
+        "displayName": "Soft Evergreen",
+        "canonical": "#e8f0eb",
+        "tonalRamp": ["oklch(15% 0.011 158.8)", "oklch(25% 0.011 158.8)", "oklch(35% 0.011 158.8)", "oklch(45% 0.011 158.8)", "oklch(55% 0.011 158.8)", "oklch(67% 0.011 158.8)", "oklch(82% 0.011 158.8)", "oklch(95% 0.011 158.8)"]
+      },
+      "sda-yellow": {
+        "role": "secondary",
+        "displayName": "SDA Yellow",
+        "canonical": "#f4c430",
+        "tonalRamp": ["oklch(15% 0.160 89.2)", "oklch(25% 0.160 89.2)", "oklch(35% 0.160 89.2)", "oklch(45% 0.160 89.2)", "oklch(55% 0.160 89.2)", "oklch(67% 0.160 89.2)", "oklch(82% 0.160 89.2)", "oklch(95% 0.160 89.2)"]
+      },
+      "yellow-deep": {
+        "role": "secondary",
+        "displayName": "Deep Yellow",
+        "canonical": "#987316",
+        "tonalRamp": ["oklch(15% 0.111 84.5)", "oklch(25% 0.111 84.5)", "oklch(35% 0.111 84.5)", "oklch(45% 0.111 84.5)", "oklch(55% 0.111 84.5)", "oklch(67% 0.111 84.5)", "oklch(82% 0.111 84.5)", "oklch(95% 0.111 84.5)"]
+      },
+      "yellow-wash": {
+        "role": "secondary",
+        "displayName": "Yellow Wash",
+        "canonical": "#fff8d8",
+        "tonalRamp": ["oklch(15% 0.042 96.9)", "oklch(25% 0.042 96.9)", "oklch(35% 0.042 96.9)", "oklch(45% 0.042 96.9)", "oklch(55% 0.042 96.9)", "oklch(67% 0.042 96.9)", "oklch(82% 0.042 96.9)", "oklch(95% 0.042 96.9)"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Register Ink",
+        "canonical": "#24312c",
+        "tonalRamp": ["oklch(15% 0.020 169.5)", "oklch(25% 0.020 169.5)", "oklch(35% 0.020 169.5)", "oklch(45% 0.020 169.5)", "oklch(55% 0.020 169.5)", "oklch(67% 0.020 169.5)", "oklch(82% 0.020 169.5)", "oklch(95% 0.020 169.5)"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#64716b",
+        "tonalRamp": ["oklch(15% 0.018 166.2)", "oklch(25% 0.018 166.2)", "oklch(35% 0.018 166.2)", "oklch(45% 0.018 166.2)", "oklch(55% 0.018 166.2)", "oklch(67% 0.018 166.2)", "oklch(82% 0.018 166.2)", "oklch(95% 0.018 166.2)"]
+      },
+      "mineral-rule": {
+        "role": "neutral",
+        "displayName": "Mineral Rule",
+        "canonical": "#d9e0dc",
+        "tonalRamp": ["oklch(15% 0.009 161.3)", "oklch(25% 0.009 161.3)", "oklch(35% 0.009 161.3)", "oklch(45% 0.009 161.3)", "oklch(55% 0.009 161.3)", "oklch(67% 0.009 161.3)", "oklch(82% 0.009 161.3)", "oklch(95% 0.009 161.3)"]
+      },
+      "mineral-rule-strong": {
+        "role": "neutral",
+        "displayName": "Strong Mineral Rule",
+        "canonical": "#bac7c0",
+        "tonalRamp": ["oklch(15% 0.017 162.7)", "oklch(25% 0.017 162.7)", "oklch(35% 0.017 162.7)", "oklch(45% 0.017 162.7)", "oklch(55% 0.017 162.7)", "oklch(67% 0.017 162.7)", "oklch(82% 0.017 162.7)", "oklch(95% 0.017 162.7)"]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Ivory Paper",
+        "canonical": "#f3f4ef",
+        "tonalRamp": ["oklch(15% 0.007 115.7)", "oklch(25% 0.007 115.7)", "oklch(35% 0.007 115.7)", "oklch(45% 0.007 115.7)", "oklch(55% 0.007 115.7)", "oklch(67% 0.007 115.7)", "oklch(82% 0.007 115.7)", "oklch(95% 0.007 115.7)"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "White Surface",
+        "canonical": "#ffffff",
+        "tonalRamp": ["oklch(15% 0 0)", "oklch(25% 0 0)", "oklch(35% 0 0)", "oklch(45% 0 0)", "oklch(55% 0 0)", "oklch(67% 0 0)", "oklch(82% 0 0)", "oklch(95% 0 0)"]
+      },
+      "surface-subtle": {
+        "role": "neutral",
+        "displayName": "Subtle Surface",
+        "canonical": "#f7f8f5",
+        "tonalRamp": ["oklch(15% 0.004 121.6)", "oklch(25% 0.004 121.6)", "oklch(35% 0.004 121.6)", "oklch(45% 0.004 121.6)", "oklch(55% 0.004 121.6)", "oklch(67% 0.004 121.6)", "oklch(82% 0.004 121.6)", "oklch(95% 0.004 121.6)"]
+      },
+      "directory-wash": {
+        "role": "neutral",
+        "displayName": "Directory Wash",
+        "canonical": "#eef3f0",
+        "tonalRamp": ["oklch(15% 0.007 160.1)", "oklch(25% 0.007 160.1)", "oklch(35% 0.007 160.1)", "oklch(45% 0.007 160.1)", "oklch(55% 0.007 160.1)", "oklch(67% 0.007 160.1)", "oklch(82% 0.007 160.1)", "oklch(95% 0.007 160.1)"]
+      }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Record Headline", "purpose": "Selected-person names and the strongest in-register headings." },
+      "title": { "displayName": "Directory Title", "purpose": "Directory and section ownership headings." },
+      "body": { "displayName": "Workhorse Body", "purpose": "Instructions, entered content, and primary reading copy." },
+      "label": { "displayName": "Operational Label", "purpose": "Buttons, form labels, state names, and actions." },
+      "metadata": { "displayName": "Record Metadata", "purpose": "Uppercase fact labels and compact handoff context." }
+    },
+    "shadows": [
+      { "name": "quiet-surface", "value": "0 1px 2px rgba(18, 61, 44, .06)", "purpose": "Minimal ambient separation for ordinary panels outside the joined register." },
+      { "name": "joined-record", "value": "0 12px 34px rgba(18, 61, 44, .07)", "purpose": "The single low ambient shadow under the joined record pane." },
+      { "name": "dialog-lift", "value": "0 24px 70px rgba(18, 61, 44, .18)", "purpose": "Reserved for the person form above its dark backdrop." }
+    ],
+    "motion": [
+      { "name": "state-standard", "value": "190ms cubic-bezier(.22, .75, .28, 1)", "purpose": "Default color, border, and restrained control-state transitions." },
+      { "name": "selection-travel", "value": "top 190ms cubic-bezier(.22, .75, .28, 1), opacity 190ms cubic-bezier(.22, .75, .28, 1)", "purpose": "Moves the one shared yellow dot between 76px directory rows while the wash changes immediately." },
+      { "name": "reduced-motion", "value": "none", "purpose": "Removes every transition within the care register when reduced motion is preferred." }
+    ],
+    "breakpoints": [
+      { "name": "facts-two-column", "value": "1100px" },
+      { "name": "register-stack", "value": "900px" },
+      { "name": "credit-compact", "value": "640px" },
+      { "name": "mobile-single-column", "value": "620px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid evergreen committed action with a quiet hover and visible keyboard focus.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">SAVE SUPPORT NOTE</button>",
+      "css": ".ds-btn-primary { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; padding: 11px 16px; background: var(--navy-950, #123d2c); color: #fff; font: 700 13px/1.3 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; transition: background-color 190ms cubic-bezier(.22,.75,.28,1), transform 190ms cubic-bezier(.22,.75,.28,1); } .ds-btn-primary:hover { background: var(--navy-800, #245b43); } .ds-btn-primary:focus-visible { outline: 3px solid rgba(234,179,8,.28); outline-offset: 3px; } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Secondary Action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "White bordered action for edit, cancel, and other reversible choices.",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">EDIT</button>",
+      "css": ".ds-btn-secondary { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line-strong, #bac7c0); border-radius: 6px; padding: 11px 16px; background: #fff; color: var(--navy-950, #123d2c); font: 700 13px/1.3 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; transition: border-color 190ms cubic-bezier(.22,.75,.28,1), transform 190ms cubic-bezier(.22,.75,.28,1); } .ds-btn-secondary:hover { border-color: var(--navy-700, #317052); } .ds-btn-secondary:focus-visible { outline: 3px solid rgba(234,179,8,.28); outline-offset: 3px; } .ds-btn-secondary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Active Navigation",
+      "kind": "nav",
+      "refersTo": "nav-active",
+      "description": "Deep evergreen rail with a restrained translucent-white active state.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Primary\"><button class=\"ds-nav-item ds-nav-item-active\" type=\"button\">VISITOR CARE</button><button class=\"ds-nav-item\" type=\"button\">ATTENDANCE</button></nav>",
+      "css": ".ds-nav { width: 220px; display: grid; gap: 6px; padding: 16px; background: var(--navy-950, #123d2c); } .ds-nav-item { min-height: 46px; border: 0; border-radius: 5px; padding: 12px; background: transparent; color: rgba(255,255,255,.74); font: 700 14px/1.3 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; text-align: left; } .ds-nav-item:hover { background: rgba(255,255,255,.08); color: #fff; } .ds-nav-item-active { background: rgba(255,255,255,.12); color: #fff; } .ds-nav-item:focus-visible { outline: 3px solid rgba(244,196,48,.42); outline-offset: 2px; }"
+    },
+    {
+      "name": "Role Pill",
+      "kind": "chip",
+      "refersTo": "role-pill",
+      "description": "Compact context chip for the active role, never for row selection.",
+      "html": "<span class=\"ds-role-pill\">USHER</span>",
+      "css": ".ds-role-pill { display: inline-flex; align-items: center; border: 1px solid var(--line-strong, #bac7c0); border-radius: 999px; padding: 8px 14px; background: var(--green-soft, #e8f0eb); color: var(--navy-800, #245b43); font: 700 12px/1.2 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }"
+    },
+    {
+      "name": "Directory Search",
+      "kind": "input",
+      "refersTo": "directory-search",
+      "description": "Solid search shell whose focus ring belongs to the complete icon-and-field control.",
+      "html": "<label class=\"ds-directory-search\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"11\" cy=\"11\" r=\"7\"></circle><path d=\"m20 20-3.6-3.6\"></path></svg><input aria-label=\"Search directory\" placeholder=\"Search people\"></label>",
+      "css": ".ds-directory-search { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line, #d9e0dc); border-radius: 6px; padding: 0 12px; background: var(--surface-subtle, #f7f8f5); color: var(--ink, #24312c); transition: border-color 190ms cubic-bezier(.22,.75,.28,1), box-shadow 190ms cubic-bezier(.22,.75,.28,1); } .ds-directory-search:focus-within { border-color: var(--gold-500, #f4c430); box-shadow: 0 0 0 3px rgba(244,196,48,.24); } .ds-directory-search input { width: 100%; min-height: 42px; border: 0; outline: 0; background: transparent; color: inherit; font: 400 16px/1.45 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }"
+    },
+    {
+      "name": "Selected Directory Row",
+      "kind": "custom",
+      "refersTo": "directory-row-selected",
+      "description": "A compact ruled record line with the shared yellow marker and immediate selection wash.",
+      "html": "<div class=\"ds-directory-frame\"><span class=\"ds-selection-marker\" aria-hidden=\"true\"></span><button class=\"ds-directory-row\" type=\"button\" aria-pressed=\"true\"><span><strong>Selected person</strong><small>Contact context</small></span><small>Current record ›</small></button></div>",
+      "css": ".ds-directory-frame { position: relative; width: 320px; border-top: 1px solid var(--line, #d9e0dc); } .ds-directory-row { width: 100%; height: 76px; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px; border: 0; border-bottom: 1px solid var(--line, #d9e0dc); border-radius: 0; padding: 15px 17px 14px 20px; background: var(--teal-50, #fff8d8); color: var(--ink, #24312c); text-align: left; } .ds-directory-row span, .ds-directory-row strong, .ds-directory-row small { display: block; min-width: 0; } .ds-directory-row strong { font: 750 15px/1.3 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; } .ds-directory-row small { margin-top: 3px; color: var(--muted, #64716b); font: 400 12px/1.3 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; } .ds-selection-marker { position: absolute; z-index: 2; top: 38px; left: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold-500, #f4c430); transform: translateY(-50%); transition: top 190ms cubic-bezier(.22,.75,.28,1), opacity 190ms cubic-bezier(.22,.75,.28,1); } .ds-directory-row:focus-visible { outline: 3px solid rgba(234,179,8,.28); outline-offset: -3px; } @media (prefers-reduced-motion: reduce) { .ds-selection-marker { transition: none; } }"
+    },
+    {
+      "name": "Care Summary Cell",
+      "kind": "card",
+      "refersTo": "care-status",
+      "description": "A square internal register cell that communicates state with label, metadata, and count.",
+      "html": "<article class=\"ds-care-status\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M20 6 9 17l-5-5\"></path></svg><span>VISITED</span><strong>1</strong><small>Last: recent visit</small></article>",
+      "css": ".ds-care-status { min-height: 100px; display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 7px 10px; border: 1px solid var(--line, #d9e0dc); border-radius: 0; padding: 20px 24px; background: #fff; color: var(--ink, #24312c); } .ds-care-status svg { color: var(--navy-800, #245b43); } .ds-care-status span { font: 700 13px/1.3 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; } .ds-care-status strong { grid-row: 1 / 3; grid-column: 3; font: 700 31px/1 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; font-variant-numeric: tabular-nums; } .ds-care-status small { grid-column: 2; color: var(--muted, #64716b); font: 400 12px/1.3 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }"
+    },
+    {
+      "name": "Solid Care Field",
+      "kind": "input",
+      "refersTo": "field-solid",
+      "description": "Readable solid field for care notes and other editable record content.",
+      "html": "<label class=\"ds-care-field\">CARE NOTE<textarea placeholder=\"Describe the support requested and the next responsible action.\"></textarea></label>",
+      "css": ".ds-care-field { display: grid; gap: 7px; color: var(--ink, #24312c); font: 700 13px/1.3 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; } .ds-care-field textarea { min-height: 104px; border: 1px solid var(--line-strong, #bac7c0); border-radius: 6px; padding: 13px 14px; background: var(--surface-subtle, #f7f8f5); color: var(--ink, #24312c); font: 400 16px/1.45 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; transition: border-color 190ms cubic-bezier(.22,.75,.28,1), box-shadow 190ms cubic-bezier(.22,.75,.28,1); } .ds-care-field textarea:hover { border-color: var(--line-strong, #bac7c0); } .ds-care-field textarea:focus { border-color: var(--gold-500, #f4c430); box-shadow: 0 0 0 4px rgba(234,179,8,.1); outline: 0; }"
+    },
+    {
+      "name": "Person Dialog",
+      "kind": "custom",
+      "refersTo": "care-dialog",
+      "description": "A restrained record form whose runtime traps focus, supports Escape, and restores focus on close.",
+      "html": "<div class=\"ds-modal-backdrop\"><section class=\"ds-person-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"ds-person-dialog-title\"><header><h2 id=\"ds-person-dialog-title\">EDIT RECORD</h2></header><label>FULL NAME<input value=\"Synthetic example\"></label><div class=\"ds-dialog-actions\"><button type=\"button\">CANCEL</button><button type=\"button\">SAVE RECORD</button></div></section></div>",
+      "css": ".ds-modal-backdrop { display: grid; place-items: center; min-height: 360px; padding: 20px; background: rgba(18,39,30,.62); } .ds-person-dialog { width: min(520px,100%); display: grid; gap: 14px; border: 1px solid var(--line, #d9e0dc); border-radius: 10px; padding: 24px; background: #fff; color: var(--ink, #24312c); box-shadow: 0 24px 70px rgba(18,61,44,.18); font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; } .ds-person-dialog header { padding-bottom: 12px; border-bottom: 1px solid var(--line, #d9e0dc); } .ds-person-dialog h2 { margin: 0; font-size: 22px; letter-spacing: -.03em; } .ds-person-dialog label { display: grid; gap: 7px; font-size: 14px; font-weight: 700; } .ds-person-dialog input { min-height: 46px; border: 1px solid var(--line-strong, #bac7c0); border-radius: 6px; padding: 13px 14px; background: var(--surface-subtle, #f7f8f5); font: inherit; } .ds-person-dialog input:focus { border-color: var(--gold-500, #f4c430); box-shadow: 0 0 0 4px rgba(234,179,8,.1); outline: 0; } .ds-dialog-actions { display: flex; justify-content: flex-end; gap: 12px; } .ds-dialog-actions button { min-height: 44px; border: 1px solid var(--line-strong, #bac7c0); border-radius: 6px; padding: 11px 16px; background: #fff; color: var(--navy-950, #123d2c); font-weight: 700; } .ds-dialog-actions button:last-child { border-color: var(--navy-950, #123d2c); background: var(--navy-950, #123d2c); color: #fff; } .ds-dialog-actions button:focus-visible { outline: 3px solid rgba(234,179,8,.28); outline-offset: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Welcome Desk Handoff",
+    "overview": "Church Care Hub feels like one composed handoff register at a church welcome desk: orderly, discreet, and ready for the next ministry worker. The visual system makes operational continuity tangible through joined compartments, literal labels, quiet typography, and a restrained paper-and-rule material language.\n\nDeep evergreen establishes trust and owns navigation and committed actions. SDA yellow stays rare and legible as the church mark, current-record wash, selection marker, guidance state, and focus signal. Warm neutrals keep those roles separated, while compact density lets ushers move quickly without making a person feel like a metric.",
+    "keyCharacteristics": [
+      "One continuous care register instead of a pile of floating cards.",
+      "Deep evergreen navigation and actions, with SDA yellow reserved for identity and state.",
+      "Quiet Plus Jakarta Sans hierarchy with plain operational wording.",
+      "Joined desktop panes and directory-first mobile stacking.",
+      "Fine mineral rules, solid fields, restrained corners, and low ambient depth.",
+      "Purposeful selection motion with an equivalent reduced-motion state."
+    ],
+    "rules": [
+      { "name": "The Separated Signal Rule", "body": "Evergreen and yellow never merge into a large blended surface; neutral paper and rules keep their semantic roles distinct.", "section": "colors" },
+      { "name": "The Yellow Means Here Rule", "body": "Use yellow only for identity, current selection, guidance, and focus; its rarity is what makes it useful.", "section": "colors" },
+      { "name": "The Workhorse Rule", "body": "Let one sans family carry every role and make hierarchy through disciplined size and weight, never through decorative type.", "section": "typography" },
+      { "name": "The Joined-at-the-Top Rule", "body": "Directory and record begin on the same edge and share one seam on desktop; responsive stacking preserves their order and visual handoff.", "section": "layout" },
+      { "name": "The Flat-by-Default Rule", "body": "Use rules and tonal adjacency first; shadows never turn status, facts, forms, or history into a floating-card pile.", "section": "elevation" },
+      { "name": "The Outer-Edge Rule", "body": "Round the enclosing register, not every compartment inside it.", "section": "shapes" },
+      { "name": "The One Marker Rule", "body": "One shared dot travels between records; never create a decorative marker per row or add selection spectacle.", "section": "components" }
+    ],
+    "dos": [
+      "Do keep evergreen responsible for navigation, trust, and committed actions.",
+      "Do use yellow sparingly for the church mark, current record, guidance, and visible focus.",
+      "Do preserve the joined-at-top register seam and compact directory boundary.",
+      "Do stack directory, selected record, actions, and history in that order on mobile.",
+      "Do keep editable fields solid, readable at 16px on small screens, and primary actions at least 44px.",
+      "Do preserve the shared selection marker, reduced-motion override, dialog focus trap, Escape close, and focus restoration.",
+      "Do keep the Cyventura footer compact and aligned to the bottom-right."
+    ],
+    "donts": [
+      "Don't split the People workspace into a pile of floating cards or add gradients, glass, bevels, or decorative lift.",
+      "Don't blend evergreen and yellow across large surfaces or use yellow as routine decoration.",
+      "Don't replace literal operational labels with promotional copy, decorative kickers, or dashboard jargon.",
+      "Don't hide primary actions, introduce horizontal overflow, or reduce editable text below 16px on mobile.",
+      "Don't fabricate or expose visitor data in previews, screenshots, or design-system examples.",
+      "Don't enlarge, center, or otherwise promote the footer credit beyond its quiet closing role."
+    ]
+  }
+}

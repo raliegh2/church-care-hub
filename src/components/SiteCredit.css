@@ -8,29 +8,29 @@
 .site-page > .center-screen,
 .site-page > .role-onboarding-page,
 .site-page > .app-shell {
-  min-height: calc(100vh - 54px);
+  min-height: calc(100vh - 40px);
 }
 
 .site-page > .app-shell .sidebar {
-  height: calc(100vh - 54px);
+  height: calc(100vh - 40px);
 }
 
 .site-credit {
-  min-height: 54px;
+  min-height: 40px;
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 8px 18px;
+  padding: 5px 16px;
   background: transparent;
   text-align: right;
 }
 
 .site-credit img {
   display: block;
-  width: 56px;
+  width: 46px;
   height: auto;
-  max-height: 22px;
+  max-height: 27px;
   object-fit: contain;
 }
 
@@ -39,7 +39,7 @@
   .site-page > .center-screen,
   .site-page > .role-onboarding-page,
   .site-page > .app-shell {
-    min-height: calc(100vh - 58px);
+    min-height: calc(100vh - 40px);
   }
 
   .site-page > .app-shell .sidebar {
@@ -47,12 +47,12 @@
   }
 
   .site-credit {
-    min-height: 58px;
-    padding: 8px 14px;
+    min-height: 40px;
+    padding: 5px 12px;
   }
 
   .site-credit img {
-    width: 50px;
-    max-height: 20px;
+    width: 44px;
+    max-height: 26px;
   }
 }

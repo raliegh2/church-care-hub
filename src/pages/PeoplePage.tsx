@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from 'react';
 import {
   CheckCircle2,
+  ChevronRight,
   CircleDashed,
   Edit3,
   MapPin,
@@ -30,6 +31,15 @@ function personContact(type: PersonType, person: Person): string {
   if (type === 'visitor') return (person as Visitor).optional_contact || 'No contact recorded';
   const member = person as Member;
   return member.phone || member.email || 'No contact recorded';
+}
+
+function personContext(type: PersonType, person: Person): string {
+  if (type === 'visitor') {
+    const visitor = person as Visitor;
+    return `First visit ${new Date(`${visitor.first_visit_date}T00:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+  }
+  const member = person as Member;
+  return member.ministry || member.address || 'Member record';
 }
 
 export function PeoplePage({ type, userId, role }: { type: PersonType; userId: string; role: AppRole }) {
@@ -89,6 +99,8 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
       .includes(normalized));
   }, [people, query, type]);
 
+  const selectedIndex = filtered.findIndex(person => person.id === selectedId);
+
   async function addNote(text: string, noteType: string) {
     if (!selected || !text.trim()) return;
     const key = type === 'visitor' ? 'visitor_id' : 'member_id';
@@ -145,24 +157,33 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
 
   return (
     <>
-      {message && <div className={`notice${isError ? ' error' : ''}`}>{message}</div>}
-      <section className="people-layout care-people-layout">
-        <article className="panel people-list">
-          <div className="section-heading">
+      {message && <div className={`notice${isError ? ' error' : ''}`} role={isError ? 'alert' : 'status'}>{message}</div>}
+      <section className="people-layout care-people-layout" aria-label={`${type === 'visitor' ? 'Visitor' : 'Member'} care workspace`}>
+        <article className="panel people-list care-directory">
+          <div className="section-heading directory-heading">
             <div>
-              <h2>{type === 'visitor' ? 'Visitor' : 'Member'} database</h2>
-              <p>{type === 'visitor' ? 'Shared by ushers, pastors and administrators.' : 'Shared by pastors and administrators.'}</p>
+              <h2>{type === 'visitor' ? 'Visitors' : 'Members'}</h2>
+              <p>{filtered.length} {filtered.length === 1 ? 'record' : 'records'} in view</p>
             </div>
-            <button className="primary" onClick={() => setEditing(null)}><Plus size={18} /> Add</button>
+            <button className="primary" onClick={() => setEditing(null)}><Plus size={18} /> Add {type}</button>
           </div>
-          <label className="search"><Search size={18} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search by name or contact" /></label>
-          <div className="rows person-rows">
+          <label className="search directory-search"><Search size={18} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder={`Search ${type === 'visitor' ? 'visitors' : 'members'}`} /></label>
+          <div
+            className={`rows person-rows${selectedIndex >= 0 ? ' has-selection' : ''}`}
+            style={{ '--selection-offset': `${Math.max(selectedIndex, 0) * 76 + 38}px` } as CSSProperties}
+          >
+            <span className="selection-marker" aria-hidden="true" />
             {filtered.map(person => {
               const isSelected = selectedId === person.id;
               return (
-                <button key={person.id} className={isSelected ? 'selected' : ''} onClick={() => setSelectedId(person.id)}>
-                  <span><strong>{personName(type, person)}</strong><small>{personContact(type, person)}</small></span>
-                  <span className="row-chevron">›</span>
+                <button
+                  key={person.id}
+                  className={isSelected ? 'selected' : ''}
+                  aria-pressed={isSelected}
+                  onClick={() => setSelectedId(person.id)}
+                >
+                  <span className="person-row-copy"><strong>{personName(type, person)}</strong><small>{personContact(type, person)}</small></span>
+                  <span className="person-row-context"><small>{personContext(type, person)}</small><ChevronRight className="row-chevron" size={17} /></span>
                 </button>
               );
             })}
@@ -243,17 +264,16 @@ function PersonDetail({
   }, [person.id]);
 
   return (
-    <div className="care-record">
+    <div className="care-record" data-person-type={type}>
       <div className="section-heading person-heading">
         <div>
-          <div className="eyebrow">{type === 'visitor' ? 'Visitor care record' : 'Member care record'}</div>
           <h2>{personName(type, person)}</h2>
           <p>{personContact(type, person)}</p>
         </div>
         <button className="secondary" onClick={onEdit}><Edit3 size={17} /> Edit</button>
       </div>
 
-      <div className="care-status-grid">
+      <div className="care-status-grid" aria-label="Care summary">
         <article className={visits.length ? 'status-card visited' : 'status-card'}>
           {visits.length ? <CheckCircle2 /> : <CircleDashed />}
           <span>{visits.length ? 'Visited' : 'Not visited yet'}</span>
@@ -268,14 +288,14 @@ function PersonDetail({
         </article>
       </div>
 
-      <div className="person-facts">
-        {member?.address && <span><MapPin size={16} /> {member.address}</span>}
-        {member?.ministry && <span>Ministry: {member.ministry}</span>}
-        {member?.birth_date && <span>Birthday: {new Date(`${member.birth_date}T00:00:00`).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span>}
-        {member?.joined_date && <span>Joined: {new Date(`${member.joined_date}T00:00:00`).toLocaleDateString()}</span>}
-        {visitor && <span>First visit: {new Date(`${visitor.first_visit_date}T00:00:00`).toLocaleDateString()}</span>}
-        {visitor && <span>Contact consent: {visitor.contact_consent ? 'Yes' : 'No'}</span>}
-        <span>Workspace: {role}</span>
+      <div className="person-facts" aria-label="Profile details">
+        {(visitor?.address || member?.address) && <div className="person-fact address-fact"><MapPin size={17} /><span><small>Address</small><strong>{visitor?.address || member?.address}</strong></span></div>}
+        {member?.ministry && <div className="person-fact"><span><small>Ministry</small><strong>{member.ministry}</strong></span></div>}
+        {member?.birth_date && <div className="person-fact"><span><small>Birthday</small><strong>{new Date(`${member.birth_date}T00:00:00`).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</strong></span></div>}
+        {member?.joined_date && <div className="person-fact"><span><small>Joined</small><strong>{new Date(`${member.joined_date}T00:00:00`).toLocaleDateString()}</strong></span></div>}
+        {visitor && <div className="person-fact"><span><small>First visit</small><strong>{new Date(`${visitor.first_visit_date}T00:00:00`).toLocaleDateString()}</strong></span></div>}
+        {visitor && <div className="person-fact"><span><small>Contact consent</small><strong>{visitor.contact_consent ? 'Yes' : 'No'}</strong></span></div>}
+        <div className="person-fact"><span><small>Workspace</small><strong>{role}</strong></span></div>
       </div>
 
       <section className="care-entry-grid">
@@ -355,8 +375,44 @@ function PersonForm({
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
+  const closeRef = useRef(close);
+  closeRef.current = close;
   const visitor = type === 'visitor' ? person as Visitor | null : null;
   const member = type === 'member' ? person as Member | null : null;
+
+  useEffect(() => {
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const form = formRef.current;
+    const focusableSelector = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    form?.querySelector<HTMLElement>(focusableSelector)?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeRef.current();
+        return;
+      }
+      if (event.key !== 'Tab' || !form) return;
+      const focusable = Array.from(form.querySelectorAll<HTMLElement>(focusableSelector));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      previousFocus?.focus();
+    };
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -366,8 +422,8 @@ function PersonForm({
     const text = (name: string) => String(form.get(name) || '').trim() || null;
     const payload = type === 'visitor' ? {
       full_name: text('full_name'),
-      preferred_name: text('preferred_name'),
       optional_contact: text('optional_contact'),
+      address: text('address'),
       first_visit_date: text('first_visit_date'),
       contact_consent: form.get('contact_consent') === 'on',
       active: true,
@@ -396,15 +452,17 @@ function PersonForm({
   }
 
   return (
-    <div className="modal-backdrop">
-      <form className="modal person-form-modal" onSubmit={submit}>
-        <div><div className="eyebrow">{person ? 'Update record' : 'New record'}</div><h2>{person ? 'Edit' : 'Add'} {type}</h2></div>
-        {error && <div className="notice error">{error}</div>}
+    <div className="modal-backdrop" onMouseDown={event => {
+      if (event.target === event.currentTarget) close();
+    }}>
+      <form ref={formRef} className="modal person-form-modal" role="dialog" aria-modal="true" aria-labelledby="person-form-title" onSubmit={submit}>
+        <div><h2 id="person-form-title">{person ? 'Edit' : 'Add'} {type}</h2></div>
+        {error && <div className="notice error" role="alert">{error}</div>}
         {type === 'visitor' ? (
           <>
             <label>Full name<input name="full_name" defaultValue={visitor?.full_name || ''} maxLength={200} required /></label>
-            <label>Preferred name<input name="preferred_name" defaultValue={visitor?.preferred_name || ''} maxLength={100} /></label>
             <label>Phone or email<input name="optional_contact" defaultValue={visitor?.optional_contact || ''} maxLength={254} /></label>
+            <label>Address<input name="address" autoComplete="street-address" defaultValue={visitor?.address || ''} maxLength={500} /></label>
             <label>First visit date<input name="first_visit_date" type="date" defaultValue={visitor?.first_visit_date || new Date().toISOString().slice(0, 10)} required /></label>
             <label className="checkbox-label"><input name="contact_consent" type="checkbox" defaultChecked={visitor?.contact_consent || false} /> Person consented to follow-up contact</label>
           </>

@@ -16,8 +16,10 @@ export interface Visitor {
   id: string;
   organization_id: string;
   full_name: string;
+  /** Legacy data retained for compatibility; the current visitor UI does not edit this field. */
   preferred_name?: string | null;
   optional_contact?: string | null;
+  address?: string | null;
   first_visit_date: string;
   contact_consent: boolean;
   active: boolean;
