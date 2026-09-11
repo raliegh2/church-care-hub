@@ -234,6 +234,201 @@ button:active:not(:disabled) { transform: translateY(1px); }
 .counter.total,
 .dashboard-metric:nth-child(n) { background: #fff; }
 
+/* The signed-in welcome and metrics form one joined daily overview register. */
+.redesign-dashboard { gap: 0; }
+
+.dashboard-welcome {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 28px;
+  min-height: 112px;
+  padding: 22px 26px;
+  border: 1px solid var(--line);
+  border-radius: 10px 10px 0 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.dashboard-welcome-copy { min-width: 0; }
+
+.dashboard-welcome h2 {
+  max-width: 28ch;
+  margin: 0;
+  color: var(--ink);
+  font-size: 27px;
+  font-weight: 750;
+  letter-spacing: -.03em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.dashboard-welcome p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.dashboard-welcome.sabbath h2 { color: var(--navy-950); }
+
+.dashboard-eastern-time {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 218px;
+  padding-left: 24px;
+  border-left: 1px solid var(--line);
+}
+
+.dashboard-eastern-time::before {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold-500);
+  content: '';
+}
+
+.dashboard-eastern-time svg { flex: 0 0 auto; color: var(--navy-800); }
+.dashboard-eastern-time span,
+.dashboard-eastern-time strong,
+.dashboard-eastern-time small { display: block; }
+.dashboard-eastern-time span { min-width: 0; }
+.dashboard-eastern-time strong {
+  color: var(--ink);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.dashboard-eastern-time small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.redesign-dashboard > .dashboard-metric-grid {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 0 0 10px 10px;
+  background: #fff;
+  box-shadow: 0 12px 34px rgba(18, 61, 44, .06);
+}
+
+.redesign-dashboard .dashboard-metric {
+  min-height: 126px;
+  padding: 20px 22px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  animation: none;
+}
+
+.redesign-dashboard .dashboard-metric:last-child { border-right: 0; }
+.redesign-dashboard .dashboard-metric:hover {
+  border-color: var(--line);
+  background: var(--surface-subtle);
+  box-shadow: none;
+  transform: none;
+}
+
+.redesign-dashboard .dashboard-metric::after { display: none; }
+
+.redesign-dashboard .dashboard-metric > div i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--navy-800);
+  box-shadow: none;
+}
+
+.redesign-dashboard .dashboard-metric.gold > div i { background: var(--gold-500); }
+.redesign-dashboard .dashboard-metric.green > div i,
+.redesign-dashboard .dashboard-metric.coral > div i,
+.redesign-dashboard .dashboard-metric.blue > div i { background: var(--navy-800); }
+.redesign-dashboard .dashboard-metric > strong { color: var(--ink); }
+.redesign-dashboard .dashboard-metric > small { color: var(--muted); }
+
+.redesign-dashboard > .dashboard-content-grid {
+  margin-top: 24px;
+  align-items: start;
+}
+
+.redesign-dashboard .trend-panel,
+.redesign-dashboard .recent-visitor-panel,
+.redesign-dashboard .priority-panel,
+.redesign-dashboard .community-mix-card {
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.redesign-dashboard .panel-title-row svg { color: var(--navy-800); }
+.redesign-dashboard .priority-row { border-radius: 0; }
+.redesign-dashboard .person-avatar {
+  background: var(--green-soft);
+  box-shadow: none;
+}
+.redesign-dashboard .person-avatar.visitor {
+  background: var(--teal-50);
+  color: var(--yellow-deep, #987316);
+}
+
+.redesign-dashboard .community-mix-body {
+  display: grid;
+  gap: 0;
+  margin-top: 16px;
+}
+
+.redesign-dashboard .community-total {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 4px 16px;
+  width: 100%;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.redesign-dashboard .community-total span,
+.redesign-dashboard .community-total small { color: var(--muted); font-size: 11px; }
+.redesign-dashboard .community-total strong {
+  grid-row: 1 / 3;
+  grid-column: 2;
+  color: var(--ink);
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.redesign-dashboard .community-legend { margin-top: 12px; }
+
+.redesign-dashboard .dashboard-birthday-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--teal-50);
+  box-shadow: none;
+}
+.redesign-dashboard .dashboard-birthday-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: none;
+  transform: none;
+}
+.redesign-dashboard .dashboard-birthday-card small,
+.redesign-dashboard .dashboard-birthday-card > svg { color: var(--teal-700); }
+
+.redesign-dashboard .next-follow-up-card {
+  border-radius: 8px;
+  background: var(--navy-950);
+  box-shadow: none;
+}
+.redesign-dashboard .next-follow-up-card:hover { background: var(--navy-800); transform: none; }
+.redesign-dashboard .next-follow-up-card small,
+.redesign-dashboard .next-follow-up-card svg { color: #fff; }
+.redesign-dashboard .next-follow-up-card span { color: #e4eee8; }
+.redesign-dashboard .next-follow-up-card.is-empty { cursor: default; }
+
 /* Welcome Desk Handoff: one joined directory and care record. */
 .care-people-layout {
   display: grid;
@@ -589,10 +784,25 @@ button:active:not(:disabled) { transform: translateY(1px); }
   .person-rows { max-height: 340px; }
   .person-detail { background: #fff; }
   .person-heading { min-height: auto; }
+  .redesign-dashboard .dashboard-metric { border-right: 0; border-bottom: 1px solid var(--line); }
+  .redesign-dashboard .dashboard-metric:last-child { border-bottom: 0; }
 }
 
 @media (max-width: 620px) {
   .content { padding: 16px 12px 28px; }
+  .dashboard-welcome {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 20px 18px;
+  }
+  .dashboard-welcome h2 { max-width: none; font-size: 24px; }
+  .dashboard-eastern-time {
+    min-width: 0;
+    padding: 15px 0 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .redesign-dashboard > .dashboard-content-grid { margin-top: 18px; }
   .workspace > header {
     min-height: 96px;
     padding: 18px 12px 14px;

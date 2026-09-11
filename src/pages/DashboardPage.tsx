@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
-import { ArrowUpRight, Cake, CalendarCheck2, ContactRound, HandHeart, Users } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowUpRight, Cake, CalendarCheck2, Clock3, ContactRound, HandHeart, Sunset, Users } from 'lucide-react';
 import { formatBirthday, getBirthdayPipeline, memberName, type MemberBirthday } from '../lib/birthdays';
+import { getDashboardGreeting } from '../lib/greeting';
 import { supabase } from '../lib/supabase';
 import { useCountUp } from '../lib/useCountUp';
 import type { AppPage } from '../lib/permissions';
@@ -57,12 +58,26 @@ function priorityFor(noteType: string): PriorityItem['priority'] {
   return 'Low';
 }
 
-export function DashboardPage({ role, onNavigate }: { role: AppRole; onNavigate: (page: AppPage) => void }) {
+export function DashboardPage({
+  role,
+  displayName,
+  onNavigate,
+}: {
+  role: AppRole;
+  displayName: string;
+  onNavigate: (page: AppPage) => void;
+}) {
   const [stats, setStats] = useState<DashboardStats>(emptyStats);
   const [recentVisitors, setRecentVisitors] = useState<RecentVisitor[]>([]);
   const [weeklyCounts, setWeeklyCounts] = useState<number[]>(Array.from({ length: 8 }, () => 0));
   const [priorityItems, setPriorityItems] = useState<PriorityItem[]>([]);
   const [nextBirthday, setNextBirthday] = useState<MemberBirthday | null>(null);
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (role === 'usher') {
@@ -166,10 +181,35 @@ export function DashboardPage({ role, onNavigate }: { role: AppRole; onNavigate:
     const total = stats.members + stats.newVisitors;
     return total ? Math.round((stats.members / total) * 100) : 0;
   }, [stats.members, stats.newVisitors]);
+  const greeting = useMemo(
+    () => getDashboardGreeting(now, role, displayName),
+    [displayName, now, role],
+  );
+
+  const welcome = (
+    <header className={`dashboard-welcome${greeting.isSabbath ? ' sabbath' : ''}`}>
+      <div className="dashboard-welcome-copy">
+        <h2>{greeting.message}</h2>
+        <p>
+          {greeting.isSabbath
+            ? 'Welcome to your Sabbath ministry overview.'
+            : 'Here is your ministry overview for today.'}
+        </p>
+      </div>
+      <div className="dashboard-eastern-time" aria-label={`New York time: ${greeting.easternTime} on ${greeting.easternDate}`}>
+        {greeting.isSabbath ? <Sunset size={20} aria-hidden="true" /> : <Clock3 size={20} aria-hidden="true" />}
+        <span>
+          <strong>{greeting.easternTime}</strong>
+          <small>{greeting.easternDate} · Eastern Time</small>
+        </span>
+      </div>
+    </header>
+  );
 
   if (role === 'usher') {
     return (
       <section className="redesign-dashboard">
+        {welcome}
         <div className="dashboard-metric-grid three-up">
           <Metric label="Visitors this month" value={stats.newVisitors} detail={`${stats.visitors} active visitor records`} tone="gold" onClick={() => onNavigate('visitors')} />
           <Metric label="First-time visitors" value={stats.newVisitors} detail="New records added this month" tone="green" onClick={() => onNavigate('visitors')} />
@@ -212,6 +252,7 @@ export function DashboardPage({ role, onNavigate }: { role: AppRole; onNavigate:
 
   return (
     <section className="redesign-dashboard">
+      {welcome}
       <div className="dashboard-metric-grid four-up">
         <Metric label="Active members" value={stats.members} detail="Shared pastoral database" tone="green" onClick={() => onNavigate('members')} />
         <Metric label="Visitors this month" value={stats.newVisitors} detail={`${stats.visitors} active visitor records`} tone="gold" onClick={() => onNavigate('visitors')} />
@@ -246,8 +287,10 @@ export function DashboardPage({ role, onNavigate }: { role: AppRole; onNavigate:
           <article className="panel community-mix-card">
             <div className="panel-title-row"><div><h2>Community mix</h2><p>Current people records.</p></div><Users size={20} /></div>
             <div className="community-mix-body">
-              <div className="community-ring" style={{ '--member-share': `${memberShare}%` } as CSSProperties}>
-                <span>{stats.members + stats.newVisitors}</span>
+              <div className="community-total">
+                <span>People in this overview</span>
+                <strong>{stats.members + stats.newVisitors}</strong>
+                <small>{memberShare}% members</small>
               </div>
               <div className="community-legend">
                 <button onClick={() => onNavigate('members')}><i className="member" /> Members <strong>{stats.members}</strong></button>
@@ -256,16 +299,23 @@ export function DashboardPage({ role, onNavigate }: { role: AppRole; onNavigate:
             </div>
           </article>
 
-          <button
-            className="next-follow-up-card"
-            disabled={!nextFocus}
-            onClick={() => nextFocus && onNavigate(nextFocus.personType === 'Member' ? 'members' : 'visitors')}
-          >
-            <small>Next care focus</small>
-            <strong>{nextFocus?.name || 'No urgent follow-up'}</strong>
-            <span>{nextFocus?.need || 'All open needs have been resolved.'}</span>
-            <ArrowUpRight size={18} />
-          </button>
+          {nextFocus ? (
+            <button
+              className="next-follow-up-card"
+              onClick={() => onNavigate(nextFocus.personType === 'Member' ? 'members' : 'visitors')}
+            >
+              <small>Next care focus</small>
+              <strong>{nextFocus.name}</strong>
+              <span>{nextFocus.need}</span>
+              <ArrowUpRight size={18} />
+            </button>
+          ) : (
+            <article className="next-follow-up-card is-empty">
+              <small>Care status</small>
+              <strong>No urgent follow-up</strong>
+              <span>All open needs have been resolved.</span>
+            </article>
+          )}
         </aside>
       </div>
     </section>

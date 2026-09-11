@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-11T14:36:11.517Z",
+  "generatedAt": "2026-09-11T19:26:49.149Z",
   "title": "Design System: Church Care Hub",
   "extensions": {
     "colorMeta": {
@@ -98,6 +98,7 @@
     },
     "shadows": [
       { "name": "quiet-surface", "value": "0 1px 2px rgba(18, 61, 44, .06)", "purpose": "Minimal ambient separation for ordinary panels outside the joined register." },
+      { "name": "joined-overview", "value": "0 12px 34px rgba(18, 61, 44, .06)", "purpose": "One low shadow under the metric base of the authenticated overview register." },
       { "name": "joined-record", "value": "0 12px 34px rgba(18, 61, 44, .07)", "purpose": "The single low ambient shadow under the joined record pane." },
       { "name": "dialog-lift", "value": "0 24px 70px rgba(18, 61, 44, .18)", "purpose": "Reserved for the person form above its dark backdrop." }
     ],
@@ -185,13 +186,22 @@
       "description": "A restrained record form whose runtime traps focus, supports Escape, and restores focus on close.",
       "html": "<div class=\"ds-modal-backdrop\"><section class=\"ds-person-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"ds-person-dialog-title\"><header><h2 id=\"ds-person-dialog-title\">EDIT RECORD</h2></header><label>FULL NAME<input value=\"Synthetic example\"></label><div class=\"ds-dialog-actions\"><button type=\"button\">CANCEL</button><button type=\"button\">SAVE RECORD</button></div></section></div>",
       "css": ".ds-modal-backdrop { display: grid; place-items: center; min-height: 360px; padding: 20px; background: rgba(18,39,30,.62); } .ds-person-dialog { width: min(520px,100%); display: grid; gap: 14px; border: 1px solid var(--line, #d9e0dc); border-radius: 10px; padding: 24px; background: #fff; color: var(--ink, #24312c); box-shadow: 0 24px 70px rgba(18,61,44,.18); font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; } .ds-person-dialog header { padding-bottom: 12px; border-bottom: 1px solid var(--line, #d9e0dc); } .ds-person-dialog h2 { margin: 0; font-size: 22px; letter-spacing: -.03em; } .ds-person-dialog label { display: grid; gap: 7px; font-size: 14px; font-weight: 700; } .ds-person-dialog input { min-height: 46px; border: 1px solid var(--line-strong, #bac7c0); border-radius: 6px; padding: 13px 14px; background: var(--surface-subtle, #f7f8f5); font: inherit; } .ds-person-dialog input:focus { border-color: var(--gold-500, #f4c430); box-shadow: 0 0 0 4px rgba(234,179,8,.1); outline: 0; } .ds-dialog-actions { display: flex; justify-content: flex-end; gap: 12px; } .ds-dialog-actions button { min-height: 44px; border: 1px solid var(--line-strong, #bac7c0); border-radius: 6px; padding: 11px 16px; background: #fff; color: var(--navy-950, #123d2c); font-weight: 700; } .ds-dialog-actions button:last-child { border-color: var(--navy-950, #123d2c); background: var(--navy-950, #123d2c); color: #fff; } .ds-dialog-actions button:focus-visible { outline: 3px solid rgba(234,179,8,.28); outline-offset: 3px; }"
+    },
+    {
+      "name": "Authenticated Overview Register",
+      "kind": "custom",
+      "refersTo": "authenticated-overview",
+      "description": "Role-and-name greeting, visible Eastern time, and four- or three-cell role metrics joined into one neutral register that stacks as one ruled mobile column.",
+      "html": "<section class=\"ds-auth-overview\" aria-label=\"Ministry overview\"><header class=\"ds-overview-welcome\"><div><h2>Good afternoon, Administrator Avery Reed.</h2><p>Here is your ministry overview for today.</p></div><div class=\"ds-overview-time\"><i aria-hidden=\"true\"></i><span><strong>3:23 PM</strong><small>Friday, September 11 · Eastern Time</small></span></div></header><div class=\"ds-overview-metrics ds-four-up\"><button class=\"ds-overview-metric\" type=\"button\"><span>Active members<i aria-hidden=\"true\"></i></span><strong>24</strong><small>Shared pastoral database</small></button><button class=\"ds-overview-metric ds-is-current\" type=\"button\"><span>Visitors this month<i aria-hidden=\"true\"></i></span><strong>3</strong><small>3 active visitor records</small></button><button class=\"ds-overview-metric\" type=\"button\"><span>Open care needs<i aria-hidden=\"true\"></i></span><strong>2</strong><small>Across members and visitors</small></button><button class=\"ds-overview-metric\" type=\"button\"><span>Visits completed<i aria-hidden=\"true\"></i></span><strong>11</strong><small>Shared care history</small></button></div></section>",
+      "css": ".ds-auth-overview { width: min(100%, 1040px); color: var(--ink, #24312c); font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; } .ds-overview-welcome { min-height: 112px; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 28px; border: 1px solid var(--line, #d9e0dc); border-radius: 10px 10px 0 0; padding: 22px 26px; background: #fff; } .ds-overview-welcome h2 { max-width: 28ch; margin: 0; font-size: 27px; font-weight: 750; letter-spacing: -.03em; line-height: 1.2; } .ds-overview-welcome p { margin: 8px 0 0; color: var(--muted, #64716b); font-size: 14px; } .ds-overview-time { min-width: 218px; display: flex; align-items: center; gap: 12px; border-left: 1px solid var(--line, #d9e0dc); padding-left: 24px; } .ds-overview-time > i { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: var(--gold-500, #f4c430); } .ds-overview-time span, .ds-overview-time strong, .ds-overview-time small { display: block; } .ds-overview-time strong { font-size: 16px; font-variant-numeric: tabular-nums; } .ds-overview-time small { margin-top: 3px; color: var(--muted, #64716b); font-size: 11px; line-height: 1.35; } .ds-overview-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 0; overflow: hidden; border: 1px solid var(--line, #d9e0dc); border-radius: 0 0 10px 10px; background: #fff; box-shadow: 0 12px 34px rgba(18,61,44,.06); } .ds-overview-metrics.ds-three-up { grid-template-columns: repeat(3,minmax(0,1fr)); } .ds-overview-metric { min-height: 126px; display: grid; align-content: center; gap: 8px; border: 0; border-right: 1px solid var(--line, #d9e0dc); border-radius: 0; padding: 20px 22px; background: #fff; color: var(--ink, #24312c); text-align: left; } .ds-overview-metric:last-child { border-right: 0; } .ds-overview-metric > span { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted, #64716b); font-size: 11px; font-weight: 700; } .ds-overview-metric > span i { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: var(--navy-800, #245b43); } .ds-overview-metric.ds-is-current > span i { background: var(--gold-500, #f4c430); } .ds-overview-metric > strong { font-size: 33px; font-variant-numeric: tabular-nums; letter-spacing: -.03em; line-height: 1; } .ds-overview-metric > small { color: var(--muted, #64716b); font-size: 11px; } .ds-overview-metric:hover { background: var(--surface-subtle, #f7f8f5); } .ds-overview-metric:focus-visible { position: relative; z-index: 1; outline: 3px solid rgba(244,196,48,.32); outline-offset: -3px; } .ds-overview-metric:active { background: var(--green-soft, #e8f0eb); } @media (max-width:1100px) { .ds-overview-metrics.ds-four-up { grid-template-columns: repeat(2,minmax(0,1fr)); } .ds-overview-metrics.ds-four-up .ds-overview-metric:nth-child(2) { border-right: 0; } .ds-overview-metrics.ds-four-up .ds-overview-metric:nth-child(-n+2) { border-bottom: 1px solid var(--line, #d9e0dc); } } @media (max-width:900px) { .ds-overview-metrics.ds-three-up { grid-template-columns: 1fr; } } @media (max-width:620px) { .ds-overview-welcome { grid-template-columns: 1fr; gap: 18px; padding: 20px 18px; } .ds-overview-welcome h2 { max-width: none; font-size: 24px; } .ds-overview-time { min-width: 0; border-top: 1px solid var(--line, #d9e0dc); border-left: 0; padding: 15px 0 0; } .ds-overview-metrics.ds-four-up, .ds-overview-metrics.ds-three-up { grid-template-columns: 1fr; } .ds-overview-metrics .ds-overview-metric { border-right: 0; border-bottom: 1px solid var(--line, #d9e0dc); } .ds-overview-metrics .ds-overview-metric:last-child { border-bottom: 0; } }"
     }
   ],
   "narrative": {
     "northStar": "Welcome Desk Handoff",
-    "overview": "Church Care Hub feels like one composed handoff register at a church welcome desk: orderly, discreet, and ready for the next ministry worker. The visual system makes operational continuity tangible through joined compartments, literal labels, quiet typography, and a restrained paper-and-rule material language.\n\nDeep evergreen establishes trust and owns navigation and committed actions. SDA yellow stays rare and legible as the church mark, current-record wash, selection marker, guidance state, and focus signal. Warm neutrals keep those roles separated, while compact density lets ushers move quickly without making a person feel like a metric.",
+    "overview": "Church Care Hub feels like one composed handoff register at a church welcome desk: orderly, discreet, and ready for the next ministry worker. The visual system makes operational continuity tangible through joined compartments, literal labels, quiet typography, and a restrained paper-and-rule material language.\n\nDeep evergreen establishes trust and owns navigation and committed actions. SDA yellow stays rare and legible as the church mark, current-record wash, selection marker, current or Sabbath context signal, guidance state, and focus signal. Warm neutrals keep those roles separated, while compact density lets ushers move quickly without making a person feel like a metric.",
     "keyCharacteristics": [
       "One continuous care register instead of a pile of floating cards.",
+      "Authenticated overview greetings paired with visible Eastern time and joined role-specific metrics.",
       "Deep evergreen navigation and actions, with SDA yellow reserved for identity and state.",
       "Quiet Plus Jakarta Sans hierarchy with plain operational wording.",
       "Joined desktop panes and directory-first mobile stacking.",
@@ -200,16 +210,20 @@
     ],
     "rules": [
       { "name": "The Separated Signal Rule", "body": "Evergreen and yellow never merge into a large blended surface; neutral paper and rules keep their semantic roles distinct.", "section": "colors" },
-      { "name": "The Yellow Means Here Rule", "body": "Use yellow only for identity, current selection, guidance, and focus; its rarity is what makes it useful.", "section": "colors" },
+      { "name": "The Yellow Means Here Rule", "body": "Use yellow only for identity, current selection, current or Sabbath context, guidance, and focus; its rarity is what makes it useful.", "section": "colors" },
       { "name": "The Workhorse Rule", "body": "Let one sans family carry every role and make hierarchy through disciplined size and weight, never through decorative type.", "section": "typography" },
       { "name": "The Joined-at-the-Top Rule", "body": "Directory and record begin on the same edge and share one seam on desktop; responsive stacking preserves their order and visual handoff.", "section": "layout" },
       { "name": "The Flat-by-Default Rule", "body": "Use rules and tonal adjacency first; shadows never turn status, facts, forms, or history into a floating-card pile.", "section": "elevation" },
       { "name": "The Outer-Edge Rule", "body": "Round the enclosing register, not every compartment inside it.", "section": "shapes" },
+      { "name": "The Joined Overview Rule", "body": "The role-and-name greeting, visible Eastern time, and role-sized metrics remain one contiguous register; the metric cells never become a colorful card row.", "section": "components" },
       { "name": "The One Marker Rule", "body": "One shared dot travels between records; never create a decorative marker per row or add selection spectacle.", "section": "components" }
     ],
     "dos": [
       "Do keep evergreen responsible for navigation, trust, and committed actions.",
       "Do use yellow sparingly for the church mark, current record, guidance, and visible focus.",
+      "Do pair authenticated role-and-name greetings with visible New York time and joined role-specific metrics.",
+      "Do use ruled metric cells and small state dots, then stack them as one contiguous column on mobile.",
+      "Do reserve clickable care-focus panels for real next actions and render the empty state as static status.",
       "Do preserve the joined-at-top register seam and compact directory boundary.",
       "Do stack directory, selected record, actions, and history in that order on mobile.",
       "Do keep editable fields solid, readable at 16px on small screens, and primary actions at least 44px.",
@@ -218,6 +232,8 @@
     ],
     "donts": [
       "Don't split the People workspace into a pile of floating cards or add gradients, glass, bevels, or decorative lift.",
+      "Don't split the authenticated overview into colorful floating metric cards.",
+      "Don't turn community mix into a progress ring or make an empty care status look actionable.",
       "Don't blend evergreen and yellow across large surfaces or use yellow as routine decoration.",
       "Don't replace literal operational labels with promotional copy, decorative kickers, or dashboard jargon.",
       "Don't hide primary actions, introduce horizontal overflow, or reduce editable text below 16px on mobile.",

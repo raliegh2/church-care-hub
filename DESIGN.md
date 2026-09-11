@@ -121,6 +121,11 @@ components:
     textColor: "{colors.ink}"
     rounded: "{rounded.register}"
     padding: "24px"
+  authenticated-overview:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.register}"
+    padding: "0"
 ---
 
 # Design System: Church Care Hub
@@ -131,11 +136,12 @@ components:
 
 Church Care Hub feels like one composed handoff register at a church welcome desk: orderly, discreet, and ready for the next ministry worker. The visual system makes operational continuity tangible through joined compartments, literal labels, quiet typography, and a restrained paper-and-rule material language.
 
-Deep evergreen establishes trust and owns navigation and committed actions. SDA yellow stays rare and legible as the church mark, current-record wash, selection marker, guidance state, and focus signal. Warm neutrals keep those roles separated, while compact density lets ushers move quickly without making a person feel like a metric.
+Deep evergreen establishes trust and owns navigation and committed actions. SDA yellow stays rare and legible as the church mark, current-record wash, selection marker, current or Sabbath context signal, guidance state, and focus signal. Warm neutrals keep those roles separated, while compact density lets ushers move quickly without making a person feel like a metric.
 
 **Key Characteristics:**
 
 - One continuous care register instead of a pile of floating cards.
+- Authenticated overview greetings paired with visible Eastern time and joined role-specific metrics.
 - Deep evergreen navigation and actions, with SDA yellow reserved for identity and state.
 - Quiet Plus Jakarta Sans hierarchy with plain operational wording.
 - Joined desktop panes and directory-first mobile stacking.
@@ -154,7 +160,7 @@ The palette is a disciplined evergreen-and-yellow identity carried by ivory pape
 
 ### Secondary
 
-- **SDA Yellow:** Marks the church identity, the shared selection dot, and focus or guidance states.
+- **SDA Yellow:** Marks the church identity, the shared selection dot, and compact current, Sabbath, focus, or guidance states inside neutral surfaces.
 - **Deep Yellow:** Carries restrained text actions where yellow must remain readable rather than fill a large area.
 - **Yellow Wash:** Identifies the current directory record without turning the row into a promotional banner.
 
@@ -173,7 +179,7 @@ The palette is a disciplined evergreen-and-yellow identity carried by ivory pape
 
 **The Separated Signal Rule.** Evergreen and yellow never merge into a large blended surface; neutral paper and rules keep their semantic roles distinct.
 
-**The Yellow Means Here Rule.** Use yellow only for identity, current selection, guidance, and focus; its rarity is what makes it useful.
+**The Yellow Means Here Rule.** Use yellow only for identity, current selection, current or Sabbath context, guidance, and focus; its rarity is what makes it useful.
 
 ## Typography
 
@@ -196,7 +202,9 @@ The palette is a disciplined evergreen-and-yellow identity carried by ivory pape
 
 ## Layout
 
-The workspace sits inside a maximum content width of 1600px. On desktop, the People surface is a joined two-column register with no gap: a compact directory between 300px and 340px wide meets a flexible record pane at one top edge. Their shared border is the seam; the directory removes its right border and the record removes its left-side corner rounding so the pair reads as one object.
+The workspace sits inside a maximum content width of 1600px. The authenticated dashboard begins with one joined overview register: the role-and-profile greeting and visible Eastern-time context share the upper compartment, and ruled metric cells close the same silhouette below. At full desktop width, pastors and administrators receive four metric columns while ushers receive three. The four-column register condenses to two columns below 1100px; the usher register becomes one column below 900px, and every dashboard metric register becomes one contiguous column at 620px and below without horizontal overflow.
+
+On desktop, the People surface is a joined two-column register with no gap: a compact directory between 300px and 340px wide meets a flexible record pane at one top edge. Their shared border is the seam; the directory removes its right border and the record removes its left-side corner rounding so the pair reads as one object.
 
 The directory header and record header share a 116px minimum height. Directory rows are a consistent 76px, the list scrolls within a 540px ceiling, and the record continues through status, facts, entry forms, and history as ruled compartments rather than detached cards. Facts use three columns at full width and two below 1100px.
 
@@ -206,11 +214,12 @@ At 900px and below, the directory stacks first, followed by the selected record,
 
 ## Elevation & Depth
 
-The system is flat by default. Paper tone, white surfaces, and one-pixel mineral rules establish most depth; a low ambient shadow belongs to the joined record pane, while stronger lift is reserved for the modal dialog over its dark evergreen veil.
+The system is flat by default. Paper tone, white surfaces, and one-pixel mineral rules establish most depth; a low ambient shadow belongs to the joined record pane and the base of the authenticated overview register, while stronger lift is reserved for the modal dialog over its dark evergreen veil. Dashboard supporting panels use either the quiet surface shadow or no shadow.
 
 ### Shadow Vocabulary
 
 - **Quiet Surface** (`0 1px 2px rgba(18, 61, 44, .06)`): Minimal ambient separation for ordinary panels outside the joined register.
+- **Joined Overview** (`0 12px 34px rgba(18, 61, 44, .06)`): One low shadow under the metric base of the authenticated overview register.
 - **Joined Record** (`0 12px 34px rgba(18, 61, 44, .07)`): A single low shadow under the record pane, never repeated on its inner sections.
 - **Dialog Lift** (`0 24px 70px rgba(18, 61, 44, .18)`): Reserved for the person form above the modal backdrop.
 
@@ -220,7 +229,7 @@ The system is flat by default. Paper tone, white surfaces, and one-pixel mineral
 
 ## Shapes
 
-Corners are restrained and functional: navigation uses 5px, controls use 6px, ordinary surfaces use 8px, and the joined register and dialog use 10px. The joined desktop register rounds only its outside corners, leaving the center seam square. Directory rows, status cells, fact cells, form halves, and history sections stay square inside the parent silhouette. Full pills are limited to compact role and count states; the yellow selection marker is a 6px circle.
+Corners are restrained and functional: navigation uses 5px, controls use 6px, dashboard supporting panels and other ordinary surfaces use 8px, and joined registers and dialogs use 10px. Joined registers round only their outside corners, leaving metric cells and center seams square. Directory rows, status cells, fact cells, form halves, and history sections stay square inside the parent silhouette. Full pills are limited to compact role and count states; small yellow and evergreen dots mark state without becoming badges.
 
 **The Outer-Edge Rule.** Round the enclosing register, not every compartment inside it.
 
@@ -240,9 +249,9 @@ Corners are restrained and functional: navigation uses 5px, controls use 6px, or
 
 ### Cards / Containers
 
-- **Corner Style:** The care workspace is a single 10px outer register; internal cells are square.
-- **Background:** The directory uses a cool washed surface, the record uses white and subtle neutral sections, and the page rests on ivory paper.
-- **Shadow Strategy:** Only the record pane receives low ambient separation; internal sections rely on rules.
+- **Corner Style:** The care workspace and authenticated overview are 10px outer registers with square internal cells; dashboard supporting panels use an 8px radius.
+- **Background:** The directory uses a cool washed surface, primary work and overview registers use white, supporting states use restrained evergreen or yellow roles, and the page rests on ivory paper.
+- **Shadow Strategy:** Only joined register bases receive low ambient separation; supporting dashboard panels use the quiet surface shadow or none, and internal sections rely on rules.
 - **Border:** One-pixel mineral rules join every section and define the desktop seam.
 - **Internal Padding:** Dense rows use roughly 15px to 20px; major work sections use 20px to 28px.
 
@@ -255,6 +264,16 @@ Corners are restrained and functional: navigation uses 5px, controls use 6px, or
 ### Navigation
 
 The desktop rail is deep evergreen through the content height. Navigation is left aligned, 5px-rounded, and white at full strength only for the active item; hover and active states use translucent white fills rather than yellow blocks. Mobile uses the compact menu affordance while the page title and task context remain visible.
+
+### Authenticated Overview Register
+
+The signed-in dashboard greets each approved user by role and profile name, with visible New York time and date kept beside the greeting on wide screens and directly below it on mobile. The greeting compartment and the metric cells form one white register: metrics are separated by mineral rules, use small evergreen or rare yellow dots for state, and never become colorful floating cards. Pastors and administrators use four cells at full desktop width, ushers use three, and mobile becomes one contiguous ruled column without horizontal overflow. Sabbath presentation changes the greeting and icon while the compact yellow time signal stays isolated inside the neutral surface.
+
+**The Joined Overview Rule.** The role-and-name greeting, visible Eastern time, and role-sized metrics remain one contiguous register; the metric cells never become a colorful card row.
+
+### Dashboard Supporting Panels
+
+Trend, queue, recent-visitor, birthday, and community panels use restrained 8px corners with low or no shadow. Community mix is expressed as a ruled total followed by a two-item dot legend, never as a progress ring. A next-care focus is a dark-evergreen button only when it has a real destination; its empty counterpart is a static dark-evergreen status panel with no implied interaction.
 
 ### Selected Directory Record
 
@@ -280,6 +299,9 @@ The Cyventura mark is a compact, transparent footer element at the bottom-right.
 
 - **Do** keep evergreen responsible for navigation, trust, and committed actions.
 - **Do** use yellow sparingly for the church mark, current record, guidance, and visible focus.
+- **Do** pair authenticated role-and-name greetings with visible New York time and joined role-specific metrics.
+- **Do** use ruled metric cells and small state dots, then stack them as one contiguous column on mobile.
+- **Do** reserve clickable care-focus panels for real next actions and render the empty state as static status.
 - **Do** preserve the joined-at-top register seam and compact directory boundary.
 - **Do** stack directory, selected record, actions, and history in that order on mobile.
 - **Do** keep editable fields solid, readable at 16px on small screens, and primary actions at least 44px.
@@ -289,6 +311,8 @@ The Cyventura mark is a compact, transparent footer element at the bottom-right.
 ### Don't:
 
 - **Don't** split the People workspace into a pile of floating cards or add gradients, glass, bevels, or decorative lift.
+- **Don't** split the authenticated overview into colorful floating metric cards.
+- **Don't** turn community mix into a progress ring or make an empty care status look actionable.
 - **Don't** blend evergreen and yellow across large surfaces or use yellow as routine decoration.
 - **Don't** replace literal operational labels with promotional copy, decorative kickers, or dashboard jargon.
 - **Don't** hide primary actions, introduce horizontal overflow, or reduce editable text below 16px on mobile.
