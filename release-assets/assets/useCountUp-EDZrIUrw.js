@@ -1,0 +1,2 @@
+import{r as t}from"./index-661QPa0M.js";function v(e,n=700){const[f,s]=t.useState(0),o=t.useRef(0),r=t.useRef(void 0);return t.useEffect(()=>{const u=o.current,c=e-u;if(c===0){s(e);return}const m=performance.now();function a(p){const i=Math.min(1,(p-m)/n),l=1-(1-i)**3;s(Math.round(u+c*l)),i<1?r.current=requestAnimationFrame(a):o.current=e}return r.current=requestAnimationFrame(a),()=>{r.current!==void 0&&cancelAnimationFrame(r.current)}},[e,n]),f}export{v as u};
+//# sourceMappingURL=useCountUp-EDZrIUrw.js.map
