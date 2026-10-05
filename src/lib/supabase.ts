@@ -3,6 +3,7 @@
 // fragment that carries it.
 import './authCallback';
 import { createClient } from '@supabase/supabase-js';
+import { createReliableFetch } from './reliableFetch';
 
 export const canonicalAppOrigin = 'https://church-care-hub.vercel.app';
 
@@ -95,6 +96,7 @@ function clearLegacyPersistedSession(): void {
 clearLegacyPersistedSession();
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
+  global: { fetch: createReliableFetch() },
   auth: {
     persistSession: false,
     autoRefreshToken: true,

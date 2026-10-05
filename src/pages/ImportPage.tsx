@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { CheckCircle2, FileSpreadsheet, ShieldCheck, Upload } from 'lucide-react';
 import { organizationId, supabase } from '../lib/supabase';
 import {
@@ -11,6 +11,9 @@ import {
 const INSERT_BATCH_SIZE = 200;
 
 export function ImportPage({ userId }: { userId: string }) {
+  const rowIds = useRef<string[]>([]);
+  const batchId = useRef(crypto.randomUUID());
+  const running = useRef(false);
   const [rows, setRows] = useState<MemberImportRow[]>([]);
   const [fileName, setFileName] = useState('');
   const [busy, setBusy] = useState(false);
@@ -18,6 +21,7 @@ export function ImportPage({ userId }: { userId: string }) {
   const [isError, setIsError] = useState(false);
 
   async function choose(file: File) {
+    if (running.current) return;
     setRows([]);
     setFileName(file.name);
     setMessage('Reading and validating the spreadsheet…');
@@ -25,6 +29,8 @@ export function ImportPage({ userId }: { userId: string }) {
 
     try {
       const parsedRows = await readMemberSpreadsheet(file);
+      rowIds.current = parsedRows.map(() => crypto.randomUUID());
+      batchId.current = crypto.randomUUID();
       setRows(parsedRows);
       setMessage(`${parsedRows.length} unique member rows passed validation and are ready to import.`);
     } catch (error) {
@@ -34,37 +40,44 @@ export function ImportPage({ userId }: { userId: string }) {
   }
 
   async function upload() {
-    if (busy || rows.length === 0) return;
+    if (running.current || rows.length === 0) return;
+    running.current = true;
     setBusy(true);
     setMessage('Importing member records…');
     setIsError(false);
 
-    const batchId = crypto.randomUUID();
     let imported = 0;
-    for (let index = 0; index < rows.length; index += INSERT_BATCH_SIZE) {
-      const batch = rows.slice(index, index + INSERT_BATCH_SIZE).map(row => ({
-        ...row,
-        organization_id: organizationId,
-        created_by: userId,
-        import_batch_id: batchId,
-        imported_at: new Date().toISOString(),
-        active: true,
-      }));
-      const { error } = await supabase.from('members').insert(batch);
-      if (error) {
-        setBusy(false);
-        setIsError(true);
-        setMessage(`Imported ${imported} members before the database rejected a batch. ${error.message}`);
-        return;
+    try {
+      for (let index = 0; index < rows.length; index += INSERT_BATCH_SIZE) {
+        const batch = rows.slice(index, index + INSERT_BATCH_SIZE).map((row, offset) => ({
+          ...row,
+          id: rowIds.current[index + offset],
+          organization_id: organizationId,
+          created_by: userId,
+          import_batch_id: batchId.current,
+          imported_at: new Date().toISOString(),
+          active: true,
+        }));
+        // Stable IDs make retries safe even when a committed response was lost.
+        const { error } = await supabase.from('members').upsert(batch, { onConflict: 'id', ignoreDuplicates: true });
+        if (error) throw error;
+        imported += batch.length;
+        setMessage(`Imported ${imported} of ${rows.length} members…`);
       }
-      imported += batch.length;
-      setMessage(`Imported ${imported} of ${rows.length} members…`);
-    }
 
-    setBusy(false);
-    setRows([]);
-    setFileName('');
-    setMessage(`Imported ${imported} members into the shared member database.`);
+      setRows([]);
+      rowIds.current = [];
+      setFileName('');
+      setMessage(`Imported ${imported} members into the shared member database.`);
+    } catch (error) {
+      setRows(current => current.slice(imported));
+      rowIds.current = rowIds.current.slice(imported);
+      setIsError(true);
+      setMessage(`Confirmed ${imported} records. Retry to finish the remaining records safely. ${(error as { message?: string })?.message || 'Connection failed.'}`);
+    } finally {
+      running.current = false;
+      setBusy(false);
+    }
   }
 
   return (
@@ -91,7 +104,7 @@ export function ImportPage({ userId }: { userId: string }) {
               <strong>Choose a CSV or Excel file</strong>
               <span>Up to {MAX_IMPORT_ROWS.toLocaleString()} rows and {Math.round(MAX_IMPORT_FILE_BYTES / 1024 / 1024)} MB</span>
               <input
-                type="file"
+                type="file" disabled={busy}
                 accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 onChange={event => {
                   const file = event.target.files?.[0];
@@ -105,7 +118,7 @@ export function ImportPage({ userId }: { userId: string }) {
             <label className="file-button replace-file-button">
               <Upload size={17} /> Replace file
               <input
-                type="file"
+                type="file" disabled={busy}
                 accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 onChange={event => {
                   const file = event.target.files?.[0];

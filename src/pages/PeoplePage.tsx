@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
 import {
   CheckCircle2,
   ChevronRight,
@@ -46,65 +46,98 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
   const [people, setPeople] = useState<Person[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [loadingPeople, setLoadingPeople] = useState(false);
+  const peopleRequest = useRef(0);
+  const careRequest = useRef(0);
+  const [historyPage, setHistoryPage] = useState(0);
+  const [hasMoreHistory, setHasMoreHistory] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const [notes, setNotes] = useState<CareNote[]>([]);
   const [visits, setVisits] = useState<VisitRecord[]>([]);
   const [editing, setEditing] = useState<Person | null | undefined>(undefined);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
+  const pendingWrites = useRef(new Map<string, { signature: string; id: string }>());
+  function writeId(kind: string, payload: unknown) {
+    const signature = JSON.stringify(payload);
+    const previous = pendingWrites.current.get(kind);
+    if (previous?.signature === signature) return previous.id;
+    const id = crypto.randomUUID();
+    pendingWrites.current.set(kind, { signature, id });
+    return id;
+  }
 
   const selected = people.find(person => person.id === selectedId) || null;
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => { setSearch(query); setPage(0); }, 300);
+    return () => window.clearTimeout(timer);
+  }, [query]);
+  useEffect(() => { setPage(0); setQuery(''); setSearch(''); }, [type]);
+
   const loadPeople = useCallback(async () => {
     const table = type === 'visitor' ? 'visitors' : 'members';
-    const { data, error } = await supabase.from(table).select('*').eq('active', true).order('created_at', { ascending: false }).limit(1_000);
+    const request = ++peopleRequest.current;
+    setLoadingPeople(true);
+    let builder = supabase.from(table).select('*').eq('organization_id', organizationId).eq('active', true);
+    const fields = type === 'visitor' ? ['full_name', 'optional_contact', 'address'] : ['first_name', 'last_name', 'email', 'phone', 'address', 'ministry'];
+    const terms = search.replace(/[^\p{L}\p{N}\s@.+_-]/gu, '').trim().slice(0, 120).split(/\s+/).filter(Boolean).slice(0, 6);
+    for (const term of terms) builder = builder.or(fields.map(field => `${field}.ilike.%${term}%`).join(','));
+    const { data, error } = await builder.order('created_at', { ascending: false }).order('id', { ascending: false }).range(page * 50, page * 50 + 50);
+    if (request !== peopleRequest.current) return;
+    setLoadingPeople(false);
     if (error) {
       setIsError(true);
       setMessage(error.message);
       return;
     }
-    const next = (data || []) as Person[];
+    setHasNext((data || []).length > 50);
+    const next = (data || []).slice(0, 50) as Person[];
     setPeople(next);
     setSelectedId(current => current && next.some(person => person.id === current) ? current : next[0]?.id || null);
-  }, [type]);
+  }, [type, search, page]);
 
-  const loadCareRecord = useCallback(async (personId: string | null) => {
+  const loadCareRecord = useCallback(async (personId: string | null, historyOffset = 0) => {
+    const request = ++careRequest.current;
+    setLoadingHistory(true);
+    if (!historyOffset) { setNotes([]); setVisits([]); setHasMoreHistory(false); setHistoryPage(0); }
     if (!personId) {
       setNotes([]);
       setVisits([]);
+      setLoadingHistory(false);
       return;
     }
     const key = type === 'visitor' ? 'visitor_id' : 'member_id';
     const [notesResult, visitsResult] = await Promise.all([
-      supabase.from('care_notes').select('*').eq(key, personId).order('created_at', { ascending: false }),
-      supabase.from('visit_records').select('*').eq(key, personId).order('visited_at', { ascending: false }),
+      supabase.from('care_notes').select('*').eq('organization_id', organizationId).eq(key, personId).order('created_at', { ascending: false }).order('id', { ascending: false }).range(historyOffset * 100, historyOffset * 100 + 100),
+      supabase.from('visit_records').select('*').eq('organization_id', organizationId).eq(key, personId).order('visited_at', { ascending: false }).order('id', { ascending: false }).range(historyOffset * 100, historyOffset * 100 + 100),
     ]);
+    if (request !== careRequest.current) return;
+    setLoadingHistory(false);
     if (notesResult.error || visitsResult.error) {
       setIsError(true);
       setMessage(notesResult.error?.message || visitsResult.error?.message || 'Unable to load the care record.');
       return;
     }
-    setNotes((notesResult.data || []) as CareNote[]);
-    setVisits((visitsResult.data || []) as VisitRecord[]);
+    setHasMoreHistory((notesResult.data || []).length > 100 || (visitsResult.data || []).length > 100);
+    setHistoryPage(historyOffset);
+    setNotes(current => historyOffset ? [...current, ...(notesResult.data || []).slice(0, 100) as CareNote[]] : (notesResult.data || []).slice(0, 100) as CareNote[]);
+    setVisits(current => historyOffset ? [...current, ...(visitsResult.data || []).slice(0, 100) as VisitRecord[]] : (visitsResult.data || []).slice(0, 100) as VisitRecord[]);
   }, [type]);
 
-  useEffect(() => { void loadPeople(); }, [loadPeople]);
-  useEffect(() => { void loadCareRecord(selectedId); }, [loadCareRecord, selectedId]);
-
-  const filtered = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return people;
-    return people.filter(person => [personName(type, person), personContact(type, person), JSON.stringify(person)]
-      .join(' ')
-      .toLowerCase()
-      .includes(normalized));
-  }, [people, query, type]);
+  useEffect(() => { void loadPeople(); return () => { peopleRequest.current++; }; }, [loadPeople]);
+  useEffect(() => { void loadCareRecord(selectedId); return () => { careRequest.current++; }; }, [loadCareRecord, selectedId]);
+  const filtered = people;
 
   const selectedIndex = filtered.findIndex(person => person.id === selectedId);
 
   async function addNote(text: string, noteType: string) {
-    if (!selected || !text.trim()) return;
+    if (!selected || !text.trim()) return false;
     const key = type === 'visitor' ? 'visitor_id' : 'member_id';
-    const { error } = await supabase.from('care_notes').insert({
+    const payload = {
       organization_id: organizationId,
       [key]: selected.id,
       note_text: text.trim(),
@@ -112,10 +145,12 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
       status: 'open',
       visibility: type === 'visitor' ? 'assigned_team' : 'pastoral_team',
       created_by: userId,
-    });
+    };
+    const { error } = await supabase.from('care_notes').upsert({ ...payload, id: writeId('note', payload) }, { onConflict: 'id', ignoreDuplicates: true });
     setIsError(Boolean(error));
     setMessage(error ? error.message : 'Support note saved.');
-    if (!error) await loadCareRecord(selected.id);
+    if (!error) { pendingWrites.current.delete('note'); await loadCareRecord(selected.id); }
+    return !error;
   }
 
   async function resolveNote(note: CareNote) {
@@ -131,28 +166,30 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
   }
 
   async function recordVisit(visitedAt: string, outcome: string, summary: string) {
-    if (!selected) return;
+    if (!selected) return false;
     const key = type === 'visitor' ? 'visitor_id' : 'member_id';
     const visitTimestamp = new Date(visitedAt);
     if (Number.isNaN(visitTimestamp.getTime())) {
       setIsError(true);
       setMessage('Choose a valid visit date and time.');
-      return;
+      return false;
     }
-    const { error } = await supabase.from('visit_records').insert({
+    const payload = {
       organization_id: organizationId,
       [key]: selected.id,
       visited_at: visitTimestamp.toISOString(),
       visited_by: userId,
       outcome,
       summary: summary.trim() || null,
-    });
+    };
+    const { error } = await supabase.from('visit_records').upsert({ ...payload, id: writeId('visit', payload) }, { onConflict: 'id', ignoreDuplicates: true });
     if (!error && type === 'member') {
       await supabase.from('members').update({ last_contact_at: visitTimestamp.toISOString() }).eq('id', selected.id);
     }
     setIsError(Boolean(error));
     setMessage(error ? error.message : 'Visit recorded in the shared care history.');
-    if (!error) await loadCareRecord(selected.id);
+    if (!error) { pendingWrites.current.delete('visit'); await loadCareRecord(selected.id); }
+    return !error;
   }
 
   return (
@@ -167,7 +204,12 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
             </div>
             <button className="primary" onClick={() => setEditing(null)}><Plus size={18} /> Add {type}</button>
           </div>
-          <label className="search directory-search"><Search size={18} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder={`Search ${type === 'visitor' ? 'visitors' : 'members'}`} /></label>
+          <label className="search directory-search"><Search size={18} /><input value={query} maxLength={120} onChange={event => setQuery(event.target.value)} placeholder={`Search ${type === 'visitor' ? 'visitors' : 'members'}`} /></label>
+          <div className="action-row" aria-label="Directory pages">
+            <button className="secondary" disabled={page === 0 || loadingPeople} onClick={() => setPage(value => value - 1)}>Previous</button>
+            <span role="status">{loadingPeople ? 'Loading…' : `Page ${page + 1}`}</span>
+            <button className="secondary" disabled={!hasNext || loadingPeople} onClick={() => setPage(value => value + 1)}>Next</button>
+          </div>
           <div
             className={`rows person-rows${selectedIndex >= 0 ? ' has-selection' : ''}`}
             style={{ '--selection-offset': `${Math.max(selectedIndex, 0) * 76 + 38}px` } as CSSProperties}
@@ -194,6 +236,7 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
         <article className="panel person-detail">
           {selected ? (
             <PersonDetail
+              key={selected.id}
               type={type}
               role={role}
               person={selected}
@@ -205,6 +248,7 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
               onVisit={recordVisit}
             />
           ) : <div className="empty">Add or select a {type} to review visits and support needs.</div>}
+          {hasMoreHistory && <button className="secondary" disabled={loadingHistory} onClick={() => void loadCareRecord(selectedId, historyPage + 1)}>{loadingHistory ? 'Loading…' : 'Load older care history'}</button>}
         </article>
       </section>
 
@@ -242,9 +286,9 @@ function PersonDetail({
   notes: CareNote[];
   visits: VisitRecord[];
   onEdit: () => void;
-  onNote: (text: string, noteType: string) => Promise<void>;
+  onNote: (text: string, noteType: string) => Promise<boolean>;
   onResolveNote: (note: CareNote) => Promise<void>;
-  onVisit: (visitedAt: string, outcome: string, summary: string) => Promise<void>;
+  onVisit: (visitedAt: string, outcome: string, summary: string) => Promise<boolean>;
 }) {
   const [noteText, setNoteText] = useState('');
   const [noteType, setNoteType] = useState('support');
@@ -284,7 +328,7 @@ function PersonDetail({
           <StickyNote />
           <span>Open support needs</span>
           <strong>{openNotes}</strong>
-          <small>{notes.length} total care notes</small>
+          <small>{notes.length} care notes loaded</small>
         </article>
       </div>
 
@@ -301,11 +345,14 @@ function PersonDetail({
       <section className="care-entry-grid">
         <form className="care-entry" onSubmit={async event => {
           event.preventDefault();
+          if (busy) return;
           setBusy(true);
-          await onVisit(visitedAt, outcome, visitSummary);
-          setVisitSummary('');
-          setVisitedAt(localDateTimeValue());
-          setBusy(false);
+          try {
+            if (await onVisit(visitedAt, outcome, visitSummary)) {
+              setVisitSummary('');
+              setVisitedAt(localDateTimeValue());
+            }
+          } finally { setBusy(false); }
         }}>
           <div className="subheading"><UserRoundCheck size={19} /><div><h3>Record a visit</h3><p>Identify when the person was visited and what happened.</p></div></div>
           <label>Date and time<input type="datetime-local" value={visitedAt} onChange={event => setVisitedAt(event.target.value)} required /></label>
@@ -316,11 +363,10 @@ function PersonDetail({
 
         <form className="care-entry" onSubmit={async event => {
           event.preventDefault();
-          if (!noteText.trim()) return;
+          if (busy || !noteText.trim()) return;
           setBusy(true);
-          await onNote(noteText, noteType);
-          setNoteText('');
-          setBusy(false);
+          try { if (await onNote(noteText, noteType)) setNoteText(''); }
+          finally { setBusy(false); }
         }}>
           <div className="subheading"><StickyNote size={19} /><div><h3>Support needed</h3><p>Save a prayer request, practical need or next action.</p></div></div>
           <label>Note category<select value={noteType} onChange={event => setNoteType(event.target.value)}><option value="support">Support need</option><option value="prayer">Prayer request</option><option value="follow_up">Follow-up action</option><option value="practical_need">Practical assistance</option></select></label>

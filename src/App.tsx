@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { AppShell } from './components/AppShell';
 import { Loading } from './components/Loading';
@@ -6,15 +6,15 @@ import { SiteCredit } from './components/SiteCredit';
 import { authCallback, clearAuthCallbackFromUrl, describeAuthCallbackError } from './lib/authCallback';
 import { canAccessPage, type AppPage } from './lib/permissions';
 import { supabase } from './lib/supabase';
-import { AdminPage } from './pages/AdminPage';
-import { AttendancePage } from './pages/AttendancePage';
+const AdminPage = lazy(() => import('./pages/AdminPage').then(module => ({ default: module.AdminPage })));
+const AttendancePage = lazy(() => import('./pages/AttendancePage').then(module => ({ default: module.AttendancePage })));
 import { AuthPage, type AuthNotice } from './pages/AuthPage';
-import { BirthdaysPage } from './pages/BirthdaysPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { ImportPage } from './pages/ImportPage';
+const BirthdaysPage = lazy(() => import('./pages/BirthdaysPage').then(module => ({ default: module.BirthdaysPage })));
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then(module => ({ default: module.DashboardPage })));
+const ImportPage = lazy(() => import('./pages/ImportPage').then(module => ({ default: module.ImportPage })));
 import { OnboardingPage } from './pages/OnboardingPage';
 import { PendingPage } from './pages/PendingPage';
-import { PeoplePage } from './pages/PeoplePage';
+const PeoplePage = lazy(() => import('./pages/PeoplePage').then(module => ({ default: module.PeoplePage })));
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import type { UserProfile } from './types';
 
@@ -54,8 +54,12 @@ export default function App() {
   const [notice, setNotice] = useState<AuthNotice | null>(initialNotice);
   const [page, setPage] = useState<AppPage>('dashboard');
   const loadedUserId = useRef<string | null>(null);
+  const profileRequest = useRef(0);
+  const [profileError, setProfileError] = useState('');
 
   const loadProfile = useCallback(async (current: Session | null) => {
+    const request = ++profileRequest.current;
+    setProfileError('');
     if (!current) {
       loadedUserId.current = null;
       setProfile(null);
@@ -69,14 +73,17 @@ export default function App() {
         supabase.from('user_profiles').select('*').eq('id', current.user.id).maybeSingle(),
         timeoutAfter(8000),
       ]);
+      if (request !== profileRequest.current) return;
       if (error) throw error;
       loadedUserId.current = current.user.id;
       setProfile((data || null) as UserProfile | null);
     } catch (error) {
+      if (request !== profileRequest.current) return;
       console.error('Unable to load profile', error);
+      setProfileError('Your profile could not be loaded. Please retry.');
       setProfile(null);
     } finally {
-      setLoading(false);
+      if (request === profileRequest.current) setLoading(false);
     }
   }, []);
 
@@ -127,7 +134,8 @@ export default function App() {
       // the profile for those events raises the full-screen loader over a page
       // that is already working.
       if (next && loadedUserId.current === next.user.id) return;
-      void loadProfile(next);
+      // Leave the auth callback before making another Supabase request.
+      window.setTimeout(() => { if (active) void loadProfile(next); }, 0);
     });
 
     return () => {
@@ -165,6 +173,7 @@ export default function App() {
   if (loading) return <SitePage><Loading /></SitePage>;
   if (!session) return <SitePage><AuthPage notice={notice} /></SitePage>;
   if (recovering) return <SitePage><ResetPasswordPage onComplete={finishRecovery} /></SitePage>;
+  if (profileError) return <SitePage><section className="panel" role="alert"><p>{profileError}</p><button className="primary" onClick={() => void loadProfile(session)}>Retry</button><button className="secondary" onClick={() => void supabase.auth.signOut()}>Sign out</button></section></SitePage>;
   if (!profile) {
     return (
       <SitePage>
@@ -187,6 +196,7 @@ export default function App() {
   return (
     <SitePage>
       <AppShell profile={profile} page={safePage} setPage={selectPage} signOut={() => void supabase.auth.signOut()}>
+        <Suspense fallback={<Loading />}>
         {safePage === 'dashboard' && (
           <DashboardPage
             role={profile.role}
@@ -200,6 +210,7 @@ export default function App() {
         {safePage === 'birthdays' && <BirthdaysPage />}
         {safePage === 'import' && <ImportPage userId={session.user.id} />}
         {safePage === 'admin' && <AdminPage userId={session.user.id} />}
+        </Suspense>
       </AppShell>
     </SitePage>
   );

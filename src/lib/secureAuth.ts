@@ -1,4 +1,6 @@
 import { supabase, supabasePublishableKey, supabaseUrl } from './supabase';
+import { createReliableFetch } from './reliableFetch';
+const boundedFetch = createReliableFetch();
 
 interface SecureLoginResponse {
   access_token?: string;
@@ -34,7 +36,7 @@ export async function secureSignIn(email: string, password: string): Promise<voi
 
   let response: Response;
   try {
-    response = await fetch(`${supabaseUrl}/functions/v1/secure-login`, {
+    response = await boundedFetch(`${supabaseUrl}/functions/v1/secure-login`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ email, password }),
@@ -88,7 +90,7 @@ export async function clearLoginThrottleForPasswordReset(): Promise<boolean> {
   };
 
   try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/secure-login`, {
+    const response = await boundedFetch(`${supabaseUrl}/functions/v1/secure-login`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ action: 'reset_complete' }),

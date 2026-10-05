@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, Cake, CalendarCheck2, Clock3, ContactRound, HandHeart, Sunset, Users } from 'lucide-react';
 import { formatBirthday, getBirthdayPipeline, memberName, type MemberBirthday } from '../lib/birthdays';
 import { getDashboardGreeting } from '../lib/greeting';
-import { supabase } from '../lib/supabase';
+import { organizationId, supabase } from '../lib/supabase';
 import { useCountUp } from '../lib/useCountUp';
 import type { AppPage } from '../lib/permissions';
 import type { AppRole, CareNote, Member } from '../types';
@@ -73,6 +73,8 @@ export function DashboardPage({
   const [priorityItems, setPriorityItems] = useState<PriorityItem[]>([]);
   const [nextBirthday, setNextBirthday] = useState<MemberBirthday | null>(null);
   const [now, setNow] = useState(() => new Date());
+  const [loadError, setLoadError] = useState('');
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 60_000);
@@ -87,6 +89,7 @@ export function DashboardPage({
     let active = true;
     void supabase.from('members')
       .select('id,organization_id,first_name,last_name,birth_date,active,created_by,created_at')
+      .eq('organization_id', organizationId)
       .eq('active', true)
       .not('birth_date', 'is', null)
       .then(({ data }) => {
@@ -97,21 +100,26 @@ export function DashboardPage({
 
   useEffect(() => {
     let active = true;
+    setLoadError('');
 
     void (async () => {
       const monthStart = monthStartIso();
       const eightWeeksAgo = new Date(Date.now() - 56 * 86_400_000).toISOString();
 
       const [visitors, visitorCare, visitorVisits, newVisitors, recent, trend] = await Promise.all([
-        supabase.from('visitors').select('id', { count: 'exact', head: true }).eq('active', true),
-        supabase.from('care_notes').select('id', { count: 'exact', head: true }).not('visitor_id', 'is', null).neq('status', 'resolved'),
-        supabase.from('visit_records').select('id', { count: 'exact', head: true }).not('visitor_id', 'is', null),
-        supabase.from('visitors').select('id', { count: 'exact', head: true }).eq('active', true).gte('created_at', monthStart),
-        supabase.from('visitors').select('id, full_name, first_visit_date, created_at').eq('active', true).order('created_at', { ascending: false }).limit(5),
-        supabase.from('visitors').select('created_at').gte('created_at', eightWeeksAgo),
+        supabase.from('visitors').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).eq('active', true),
+        supabase.from('care_notes').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).not('visitor_id', 'is', null).neq('status', 'resolved'),
+        supabase.from('visit_records').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).not('visitor_id', 'is', null),
+        supabase.from('visitors').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).eq('active', true).gte('created_at', monthStart),
+        supabase.from('visitors').select('id, full_name, first_visit_date, created_at').eq('organization_id', organizationId).eq('active', true).order('created_at', { ascending: false }).limit(5),
+        supabase.from('visitors').select('created_at').eq('organization_id', organizationId).gte('created_at', eightWeeksAgo),
       ]);
 
       if (!active) return;
+      if ([visitors, visitorCare, visitorVisits, newVisitors, recent, trend].some(result => result.error)) {
+        setLoadError('The overview could not be updated. Please retry.');
+        return;
+      }
       setRecentVisitors((recent.data || []) as RecentVisitor[]);
       setWeeklyCounts(buildWeeklyCounts((trend.data || []) as Array<{ created_at: string }>));
 
@@ -128,23 +136,29 @@ export function DashboardPage({
       }
 
       const [members, care, visits, notesResult] = await Promise.all([
-        supabase.from('members').select('id', { count: 'exact', head: true }).eq('active', true),
-        supabase.from('care_notes').select('id', { count: 'exact', head: true }).neq('status', 'resolved'),
-        supabase.from('visit_records').select('id', { count: 'exact', head: true }),
+        supabase.from('members').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).eq('active', true),
+        supabase.from('care_notes').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).neq('status', 'resolved'),
+        supabase.from('visit_records').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId),
         supabase
           .from('care_notes')
           .select('id, note_text, note_type, visitor_id, member_id, created_at')
+          .eq('organization_id', organizationId)
           .neq('status', 'resolved')
           .order('created_at', { ascending: false })
           .limit(5),
       ]);
 
+      if (!active) return;
+      if ([members, care, visits, notesResult].some(result => result.error)) {
+        setLoadError('The overview could not be updated. Please retry.');
+        return;
+      }
       const notes = (notesResult.data || []) as CareNote[];
       const memberIds = [...new Set(notes.map(note => note.member_id).filter(Boolean))] as string[];
       const visitorIds = [...new Set(notes.map(note => note.visitor_id).filter(Boolean))] as string[];
       const [memberRows, visitorRows] = await Promise.all([
-        supabase.from('members').select('id, first_name, last_name').in('id', memberIds.length ? memberIds : [EMPTY_UUID]),
-        supabase.from('visitors').select('id, full_name').in('id', visitorIds.length ? visitorIds : [EMPTY_UUID]),
+        supabase.from('members').select('id, first_name, last_name').eq('organization_id', organizationId).in('id', memberIds.length ? memberIds : [EMPTY_UUID]),
+        supabase.from('visitors').select('id, full_name').eq('organization_id', organizationId).in('id', visitorIds.length ? visitorIds : [EMPTY_UUID]),
       ]);
 
       if (!active) return;
@@ -174,7 +188,7 @@ export function DashboardPage({
     })();
 
     return () => { active = false; };
-  }, [role]);
+  }, [role, retry]);
 
   const maxWeekly = Math.max(1, ...weeklyCounts);
   const memberShare = useMemo(() => {
@@ -205,6 +219,8 @@ export function DashboardPage({
       </div>
     </header>
   );
+
+  if (loadError) return <>{welcome}<div className="notice error" role="alert">{loadError} <button className="secondary" onClick={() => setRetry(value => value + 1)}>Retry</button></div></>;
 
   if (role === 'usher') {
     return (
