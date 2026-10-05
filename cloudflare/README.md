@@ -20,8 +20,10 @@ The authentication tests verify migrated-password login, signed cookie rejection
 
 ## Cutover and rollback
 
-The Cloudflare application already runs independently of Supabase. Gmail delivery still needs a live verification before enabling signup/recovery. A reversible 307 redirect has been staged in the existing Vercel project; the repository's `vercel.json` also redirects future Vercel builds to Cloudflare.
+The Cloudflare application runs independently of Supabase. Gmail authentication and a deployed Worker recovery-email request to the sender mailbox have been verified; signup and recovery are enabled. The old `church-care-hub.vercel.app` address now sends a reversible 307 redirect to Cloudflare, preserving paths and query strings. The repository's `vercel.json` also redirects future Vercel builds to Cloudflare.
 
-Before activating traffic cutover, stop writes on the old application, export and reconcile any new records or password changes, and preserve a final backup. Disable old Supabase client writes so already-open Vercel tabs cannot create diverging records. Keep the Supabase project as a rollback backup until user verification is complete; do not delete it as part of deployment. Its keepalive is no longer required by the new application, but leave the existing schedule until cutover is finished.
+The final application snapshot matched the imported data, and an integrity checksum confirmed all three migrated credentials still matched the source. A private final snapshot is retained. After verifying the redirect, the user explicitly approved pausing the old Supabase project as a rollback backup. The pause request succeeded. No broad database grants were changed, and the old project was not deleted. Its old keepalive is no longer needed by Church Care Hub.
+
+After the pause request, deployed synthetic-account tests again passed for login, record creation/edit/reopening, and session revocation. User verification of real accounts remains outstanding at the user's request. The delivery test confirms the Worker email request succeeded; inbox placement should be checked by the mailbox owner.
 
 Rollback requires restoring the old Vercel deployment/routing and reconciling any Cloudflare writes made after cutover. Simply redirecting back would discard those new changes from the user's view.
