@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { CheckCircle2, FileSpreadsheet, ShieldCheck, Upload } from 'lucide-react';
-import { organizationId, supabase } from '../lib/supabase';
+import { organizationId, backend } from '../lib/backend';
 import {
   MAX_IMPORT_FILE_BYTES,
   MAX_IMPORT_ROWS,
@@ -59,7 +59,7 @@ export function ImportPage({ userId }: { userId: string }) {
           active: true,
         }));
         // Stable IDs make retries safe even when a committed response was lost.
-        const { error } = await supabase.from('members').upsert(batch, { onConflict: 'id', ignoreDuplicates: true });
+        const { error } = await backend.from('members').upsert(batch, { onConflict: 'id', ignoreDuplicates: true });
         if (error) throw error;
         imported += batch.length;
         setMessage(`Imported ${imported} of ${rows.length} members…`);

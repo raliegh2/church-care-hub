@@ -86,7 +86,7 @@ export const authCallback: AuthCallback = readAuthCallback();
 /**
  * Drop a rejected link's parameters from the address bar so the failure is not
  * replayed on every refresh. This runs after mount rather than at module load,
- * so it cannot erase a fragment that the legacy-domain redirect in `supabase.ts`
+ * so it cannot erase a fragment that the legacy-domain redirect in `backend.ts`
  * still needs to carry across to the canonical host. A fragment holding
  * credentials is never touched — the Supabase client clears that one itself,
  * unless `force` says the client already tried and failed, which leaves a spent

@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "church-care-hub",
+  "main": "cloudflare/api.mjs",
+  "compatibility_date": "2026-10-05",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/readyz"]
+  },
+  "vars": {
+    "PUBLIC_BASE_URL": "https://church-care-hub.church-care-hub.workers.dev",
+    "MAIL_FROM": "centralislip046@gmail.com",
+    "SMTP_USER": "centralislip046@gmail.com",
+    "SMTP_HOST": "smtp.gmail.com",
+    "ORGANIZATION_ID": "a9456be1-5b06-4fbb-b5c1-cd5b66b3ff6a"
+  },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "churchcarehub-migration",
+    "database_id": "8f5012f1-66bf-4437-9384-d0d4a8e2911e",
+    "migrations_dir": "cloudflare/migrations"
+  }]
+}
