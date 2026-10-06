@@ -1,0 +1,10 @@
+{
+  "name": "churchcarehub-database-migration",
+  "compatibility_date": "2026-10-05",
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "churchcarehub-migration",
+    "database_id": "8f5012f1-66bf-4437-9384-d0d4a8e2911e",
+    "migrations_dir": "migrations"
+  }]
+}

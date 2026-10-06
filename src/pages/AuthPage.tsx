@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Brand } from '../components/Brand';
 import { secureSignIn, SecureLoginError } from '../lib/secureAuth';
-import { canonicalAppOrigin, supabase } from '../lib/supabase';
+import { canonicalAppOrigin, backend, accountRequest } from '../lib/backend';
 import {
   isPasswordPolicyError,
   meetsPasswordPolicy,
@@ -25,6 +25,10 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
   // Shown after any failed sign-in, never conditioned on whether the account
   // exists, so it cannot be used to probe for registered addresses.
   const [showSetupHint, setShowSetupHint] = useState(false);
+  const [registrationEnabled, setRegistrationEnabled] = useState(false);
+  useEffect(() => {
+    void accountRequest('config').then(({ data }) => setRegistrationEnabled(Boolean(data?.registrationEnabled)));
+  }, []);
 
   // Recovery ends by signing out and returning here, so the outcome of the
   // reset has to be shown on this screen rather than the one that is going away.
@@ -63,7 +67,7 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
     setBusy(true);
     try {
       if (signup) {
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await backend.auth.signUp({
           email: normalizedEmail,
           password,
           options: {
@@ -120,14 +124,14 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
 
     setBusy(true);
     setIsError(false);
-    const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+    const { error } = await backend.auth.resetPasswordForEmail(normalizedEmail, {
       redirectTo: `${canonicalAppOrigin}/`,
     });
     setBusy(false);
 
-    if (error?.status === 429) {
+    if (error) {
       setIsError(true);
-      setMessage('Too many password-reset requests. Please wait before trying again.');
+      setMessage(error.status === 429 ? 'Too many password-reset requests. Please wait before trying again.' : error.message);
       return;
     }
 
@@ -172,7 +176,7 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
             </div>
           )}
 
-          {showSetupHint && (
+          {showSetupHint && registrationEnabled && (
             <div className="notice" role="status" aria-live="polite">
               If you have not signed in on this site before, or never confirmed your email,
               use “Forgot password?” below to set the password for this account.
@@ -227,7 +231,7 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
             <span>{signup ? 'Already have an account?' : 'New here?'}</span>
             <button
               className="text-btn"
-              disabled={busy}
+              disabled={busy || (!signup && !registrationEnabled)}
               onClick={() => {
                 setSignup(!signup);
                 setMessage('');
@@ -239,6 +243,7 @@ export function AuthPage({ notice }: { notice?: AuthNotice | null }) {
               {signup ? 'Sign in' : 'Create an account and choose your role'}
             </button>
           </div>
+          {!registrationEnabled && <p className="auth-footnote">New accounts and password recovery are temporarily unavailable. Contact your ministry administrator for help.</p>}
         </div>
       </section>
     </main>

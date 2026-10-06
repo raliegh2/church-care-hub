@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Cake, CalendarClock, History } from 'lucide-react';
 import { formatBirthday, getBirthdayPipeline, memberName, type MemberBirthday } from '../lib/birthdays';
-import { supabase } from '../lib/supabase';
+import { backend } from '../lib/backend';
 import type { Member } from '../types';
 
 function timingLabel(daysAway: number) {
@@ -28,7 +28,7 @@ export function BirthdaysPage() {
 
   useEffect(() => {
     let active = true;
-    void supabase.from('members')
+    void backend.from('members')
       .select('id,organization_id,first_name,last_name,birth_date,active,created_by,created_at')
       .eq('active', true)
       .not('birth_date', 'is', null)

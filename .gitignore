@@ -6,3 +6,6 @@ dist
 .vercel
 .DS_Store
 supabase/.temp/
+.wrangler/
+.dev.vars
+.migration/

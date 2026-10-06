@@ -26,7 +26,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          live_origin="https://church-care-hub.vercel.app"
+          live_origin="https://church-care-hub.church-care-hub.workers.dev"
           html="$(curl --fail --silent --show-error --location "${live_origin}/")"
           js_path="$(printf '%s' "$html" | grep -oE 'src="[^"]+\.js"' | head -n 1 | cut -d'"' -f2)"
           css_path="$(printf '%s' "$html" | grep -oE 'href="[^"]+\.css"' | head -n 1 | cut -d'"' -f2)"
@@ -52,7 +52,8 @@ jobs:
 
           test "$(wc -c < pinned-live-assets/assets/app.js)" -gt 100000
           test "$(wc -c < pinned-live-assets/assets/base.css)" -gt 1000
-          grep -q "supabase" pinned-live-assets/assets/app.js
+          grep -q '/api/rest/v1' pinned-live-assets/assets/app.js
+          grep -q '/api/auth' pinned-live-assets/assets/app.js
 
           printf '%s\n' \
             "origin=${live_origin}" \
