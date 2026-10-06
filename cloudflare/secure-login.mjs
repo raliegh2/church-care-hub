@@ -1,4 +1,5 @@
 import { getAuth } from './auth.mjs';
+import { boundedText } from './request-body.mjs';
 const reply = (payload, status = 200, retry = 0) => Response.json(payload, { status, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', ...(retry ? { 'Retry-After': String(retry) } : {}) } });
 const unavailable = () => reply({ error: 'Sign-in is temporarily unavailable.' }, 503);
 async function hash(text) {
@@ -26,8 +27,7 @@ export async function handleSecureLogin(request, env, signIn = authRequest => ge
   if (request.method !== 'POST') return reply({ error: 'Method not allowed.' }, 405);
   if (request.headers.get('Origin') !== new URL(request.url).origin) return reply({ error: 'Request origin is not allowed.' }, 403);
   try {
-    const raw = await request.text();
-    if (raw.length > 8192) return reply({ error: 'Invalid request.' }, 400);
+    const raw = await boundedText(request, 8192);
     let body;
     try { body = JSON.parse(raw); } catch { return reply({ error: 'Invalid request.' }, 400); }
     const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
@@ -58,6 +58,7 @@ export async function handleSecureLogin(request, env, signIn = authRequest => ge
     if (retryAfter || response.status === 429) return reply({ error: 'Too many sign-in attempts. Please wait before trying again.', retry_after_seconds: Math.max(1, retryAfter) }, 429, Math.max(1, retryAfter));
     return reply({ error: 'The email or password is incorrect.' }, 401);
   } catch (failure) {
+    if (failure.status === 413) return reply({ error: 'Request is too large.' }, 413);
     if (failure.status === 401) return reply({ error: 'Authentication required.' }, 401);
     return unavailable();
   }

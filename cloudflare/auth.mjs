@@ -3,6 +3,7 @@ import { scrypt, randomBytes, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
+import { boundedText } from './request-body.mjs';
 
 const derive = promisify(scrypt);
 export async function hashPassword(password) {
@@ -100,8 +101,13 @@ export async function handleAuth(request, env) {
   if (request.method === 'POST' && request.headers.get('Origin') !== env.PUBLIC_BASE_URL) return reply('Request origin is not allowed', 403);
   if (['/sign-up/email', '/request-password-reset', '/send-verification-email'].includes(route) && !emailReady(env)) return reply('Account email is not configured yet. Contact your administrator.', 503);
   if (request.method === 'POST') {
-    const body = await request.clone().text();
-    if (body.length > 8192) return reply('Request is too large', 413);
+    let body;
+    try { body = await boundedText(request, 8192); }
+    catch (failure) { return reply(failure.status === 413 ? 'Request is too large' : 'Invalid request', failure.status === 413 ? 413 : 400); }
+    // Replay only validated, bounded bytes; do not tee an unbounded original.
+    const headers = new Headers(request.headers);
+    headers.delete('Content-Length');
+    request = new Request(request.url, { method: request.method, headers, body });
     if (['/sign-up/email', '/reset-password'].includes(route)) {
       let payload;
       try { payload = JSON.parse(body); } catch { return reply('Invalid request', 400); }

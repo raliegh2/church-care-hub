@@ -8,7 +8,7 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*", "/readyz"]
+    "run_worker_first": ["/api/*", "/readyz", "/*.map"]
   },
   "vars": {
     "PUBLIC_BASE_URL": "https://church-care-hub.church-care-hub.workers.dev",

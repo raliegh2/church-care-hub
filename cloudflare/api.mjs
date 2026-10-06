@@ -1,6 +1,7 @@
 import catalog from './source-catalog.json' with { type: 'json' };
 import { handleSecureLogin } from './secure-login.mjs';
 import { getAuth, handleAuth } from './auth.mjs';
+import { boundedText } from './request-body.mjs';
 
 const publicTables = new Set(['user_profiles', 'visitors', 'members', 'care_notes', 'visit_records', 'attendance_sessions']);
 const schemas = new Map(catalog.catalog.map(table => [table.table, table.columns]));
@@ -95,9 +96,7 @@ export async function authenticate(request, env) {
 }
 
 async function readBody(request) {
-  if (Number(request.headers.get('Content-Length')) > 1024 * 1024) throw error('Request is too large', 413);
-  const body = await request.text();
-  if (body.length > 1024 * 1024) throw error('Request is too large', 413);
+  const body = await boundedText(request, 1024 * 1024);
   try { return JSON.parse(body); } catch { throw error('Invalid JSON'); }
 }
 function selectedColumns(table, params) {
@@ -226,6 +225,7 @@ async function rpc(request, env, actor) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname.endsWith('.map')) return new Response('Not found', { status: 404, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
     if (url.pathname === '/readyz') {
       try { await env.DB.prepare('SELECT 1 FROM cf_auth_users LIMIT 1').first(); if (!env.AUTH_SECRET) throw new Error('Missing secret'); return json({ ok: true, database: 'D1', authentication: 'Cloudflare' }); }
       catch { return json({ ok: false }, 503); }
