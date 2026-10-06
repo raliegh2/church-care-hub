@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "build:cloudflare": "node cloudflare/build.mjs",
     "deploy:cloudflare": "npm run build:cloudflare && wrangler deploy",
-    "test:cloudflare": "node --test cloudflare/api.test.mjs cloudflare/auth.test.mjs cloudflare/request-body.test.mjs scripts/reliability.test.cjs"
+    "test:cloudflare": "node --test cloudflare/api.test.mjs cloudflare/auth.test.mjs cloudflare/request-body.test.mjs scripts/reliability.test.cjs scripts/memberSpreadsheet.test.cjs"
   },
   "dependencies": {
     "@supabase/postgrest-js": "2.117.2",
