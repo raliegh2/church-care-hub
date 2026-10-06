@@ -2,11 +2,38 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import bcrypt from 'bcryptjs';
 import worker, { authenticate } from './api.mjs';
-import { createAuth, hashPassword, verifyPassword } from './auth.mjs';
+import { createAuth, handleAuth, hashPassword, verifyPassword } from './auth.mjs';
 import { testDatabase } from './test-database.mjs';
+import { workerSmtpSocket } from './smtp-socket.mjs';
 
 const origin = 'https://example.test';
 const password = 'Migration-Test-Password1!';
+
+test('mail transport failures do not produce a false success response', async () => {
+  const {sqlite,env,request}=await fixture();
+  Object.assign(env,{MAIL_FROM:'sender@example.test',SMTP_HOST:'smtp.example.test',SMTP_USER:'sender',SMTP_PASSWORD:'synthetic-test-only'});
+  const auth=createAuth(env,{sendEmail:async()=>{throw new Error('synthetic transport failure');}});
+  const response=await handleAuth(request('/api/auth/request-password-reset',{email:'test@example.test',redirectTo:origin+'/reset-password'}),env,auth);
+  assert.equal(response.status,503);
+  assert.match((await response.json()).message,/temporarily unavailable/);
+  assert.equal((await handleAuth(request('/api/auth/request-password-reset',{email:'unknown@example.test',redirectTo:origin+'/reset-password'}),env,auth)).status,200);
+  sqlite.close();
+});
+
+test('native SMTP adapter keeps TLS enabled and retries only connection opening', async () => {
+  let attempts=0,closures=0;
+  const options=[];
+  const connector=(address,configuration)=>{
+    options.push({address,configuration}); attempts++;
+    return {opened:attempts===1?Promise.reject(new Error('synthetic opening failure')):Promise.resolve({}),closed:new Promise(()=>{}),readable:new ReadableStream(),writable:new WritableStream(),close:async()=>{closures++;}};
+  };
+  const socket=await workerSmtpSocket('smtp.example.test',connector);
+  assert.equal(attempts,2); assert.equal(closures,1); assert.equal(socket.secured,true);
+  for(const option of options) assert.deepEqual(option,{address:{hostname:'smtp.example.test',port:465},configuration:{secureTransport:'on'}});
+  socket.connection.destroy();
+  await new Promise(resolve=>setTimeout(resolve,0));
+  assert.equal(closures,2);
+});
 async function fixture() {
   const { db, sqlite } = testDatabase();
   const env = { DB: db, AUTH_SECRET: 'synthetic-test-secret-at-least-32-characters', PUBLIC_BASE_URL: origin };
@@ -99,10 +126,10 @@ test('email verification gates signup; password reset tokens are one-use and rev
   assert.equal(verified.status,302);
   const signedIn = await attempt(); assert.equal(signedIn.status,200);
   const cookie = signedIn.headers.get('set-cookie').split(';')[0];
-  const resetRequest = await auth.handler(request('/api/auth/request-password-reset',{email:'new@example.test',redirectTo:origin+'/reset-password'}));
+  const resetRequest = await handleAuth(request('/api/auth/request-password-reset',{email:'new@example.test',redirectTo:origin+'/reset-password'}),env,auth);
   assert.equal(resetRequest.status,200);
   const resetEmail = messages.find(message => message.subject === 'Reset your password');
-  const resetLanding = await auth.handler(new Request(resetEmail.url));
+  const resetLanding = await handleAuth(new Request(resetEmail.url),env,auth);
   assert.equal(resetLanding.status,302);
   const token = new URL(resetLanding.headers.get('Location')).searchParams.get('token');
   assert.ok(token);

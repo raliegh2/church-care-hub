@@ -26,7 +26,7 @@ export async function accountRequest(path: string, body?: unknown) {
       credentials: 'same-origin', cache: 'no-store',
       headers: { 'Content-Type': 'application/json' },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-      signal: AbortSignal.timeout(12000)
+      signal: AbortSignal.timeout(['request-password-reset', 'sign-up/email', 'send-verification-email'].includes(path) ? 35000 : 12000)
     });
     const data = await response.json().catch(() => ({}));
     return { data, error: response.ok ? null : { message: data.message || data.error || 'The account request failed.', status: response.status, code: data.code } as AuthError };

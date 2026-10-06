@@ -4,6 +4,11 @@ import { promisify } from 'node:util';
 import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
 import { boundedText } from './request-body.mjs';
+import { resolve4 } from 'node:dns/promises';
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { workerSmtpSocket } from './smtp-socket.mjs';
+
+const emailAttempts = new AsyncLocalStorage();
 
 const derive = promisify(scrypt);
 export async function hashPassword(password) {
@@ -26,11 +31,17 @@ export async function sendAccountEmail(env, to, subject, url) {
   if (!emailReady(env)) throw new Error('Account email is not configured');
   const target = new URL(url);
   if (target.origin !== env.PUBLIC_BASE_URL) throw new Error('Invalid account link origin');
+  // Workers use native hostname-verified TLS streams; local Node uses IPv4
+  // with explicit certificate hostname/SNI rather than randomized AAAA answers.
+  const workerRuntime = globalThis.navigator?.userAgent === 'Cloudflare-Workers';
+  const addresses = workerRuntime ? [env.SMTP_HOST] : await resolve4(env.SMTP_HOST);
+  if (!addresses.length) throw new Error('Account email host is unavailable');
   const transport = nodemailer.createTransport({
-    host: env.SMTP_HOST, port: 465, secure: true,
+    host: addresses[0], port: 465, secure: true, tls: { servername: env.SMTP_HOST },
     auth: { user: env.SMTP_USER, pass: env.SMTP_PASSWORD },
     connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 15000,
-    logger: false, debug: false
+    logger: false, debug: false,
+    ...(workerRuntime ? { getSocket: (_options, callback) => workerSmtpSocket(env.SMTP_HOST).then(socket => callback(null, socket), callback) } : {})
   });
   try {
     await transport.sendMail({ from: { name: 'Church Care Hub', address: env.MAIL_FROM }, to, subject,
@@ -39,6 +50,15 @@ export async function sendAccountEmail(env, to, subject, url) {
 }
 export function createAuth(env, { schemaOnly = false, sendEmail = sendAccountEmail } = {}) {
   if (!env.AUTH_SECRET || env.AUTH_SECRET.length < 32) throw new Error('Authentication secret is missing');
+  const deliver = async (...args) => {
+    try { return await sendEmail(...args); }
+    catch (failure) {
+      console.error('Account email delivery failed', { code: failure.code || failure.name, stage: failure.command || 'connection' });
+      const attempt = emailAttempts.getStore();
+      if (attempt) attempt.failed = true;
+      throw new Error('Account email delivery failed');
+    }
+  };
   return betterAuth({
     appName: 'Church Care Hub', database: env.DB,
     secret: env.AUTH_SECRET, baseURL: env.PUBLIC_BASE_URL, basePath: '/api/auth',
@@ -60,7 +80,7 @@ export function createAuth(env, { schemaOnly = false, sendEmail = sendAccountEma
       minPasswordLength: 11, maxPasswordLength: 128,
       password: { hash: hashPassword, verify: verifyPassword },
       resetPasswordTokenExpiresIn: 1800, revokeSessionsOnPasswordReset: true,
-      sendResetPassword: async ({ user, url }) => sendEmail(env, user.email, 'Reset your password', url),
+      sendResetPassword: async ({ user, url }) => deliver(env, user.email, 'Reset your password', url),
       onPasswordReset: async ({ user }) => {
         const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('email:' + user.email.toLowerCase()));
         const key = 'email:' + [...new Uint8Array(bytes)].map(byte => byte.toString(16).padStart(2, '0')).join('');
@@ -69,7 +89,7 @@ export function createAuth(env, { schemaOnly = false, sendEmail = sendAccountEma
     },
     emailVerification: {
       sendOnSignUp: true, sendOnSignIn: true, expiresIn: 3600,
-      sendVerificationEmail: async ({ user, url }) => sendEmail(env, user.email, 'Verify your email address', url)
+      sendVerificationEmail: async ({ user, url }) => deliver(env, user.email, 'Verify your email address', url)
     },
     databaseHooks: {
       user: { create: { after: async user => {
@@ -92,11 +112,12 @@ export function getAuth(env) {
   return auth;
 }
 const endpoints = new Set(['/get-session', '/sign-out', '/sign-up/email', '/request-password-reset', '/reset-password', '/verify-email', '/send-verification-email']);
-export async function handleAuth(request, env) {
+export async function handleAuth(request, env, auth = null) {
   const url = new URL(request.url), route = url.pathname.slice('/api/auth'.length);
   const reply = (message, status) => Response.json({ message }, { status, headers: { 'Cache-Control': 'no-store' } });
   if (route === '/config' && request.method === 'GET') return Response.json({ registrationEnabled: emailReady(env), passwordRecoveryEnabled: emailReady(env) }, { headers: { 'Cache-Control': 'no-store' } });
-  if (!endpoints.has(route)) return reply('Account action not found', 404);
+  const resetCallback = /^\/reset-password\/[A-Za-z0-9_-]{16,128}$/.test(route) && request.method === 'GET';
+  if (!endpoints.has(route) && !resetCallback) return reply('Account action not found', 404);
   if (!['GET', 'POST'].includes(request.method)) return reply('Method not allowed', 405);
   if (request.method === 'POST' && request.headers.get('Origin') !== env.PUBLIC_BASE_URL) return reply('Request origin is not allowed', 403);
   if (['/sign-up/email', '/request-password-reset', '/send-verification-email'].includes(route) && !emailReady(env)) return reply('Account email is not configured yet. Contact your administrator.', 503);
@@ -116,7 +137,9 @@ export async function handleAuth(request, env) {
     }
   }
   try {
-    const response = await getAuth(env).handler(request);
+    const attempt = { failed: false };
+    const response = await emailAttempts.run(attempt, () => (auth || getAuth(env)).handler(request));
+    if (attempt.failed) return reply('Account email is temporarily unavailable. Please try again shortly.', 503);
     const headers = new Headers(response.headers);
     headers.set('Cache-Control', 'no-store');
     headers.set('X-Content-Type-Options', 'nosniff');
