@@ -6,7 +6,7 @@ on:
 permissions:
   issues: write
 concurrency:
-  group: pipeline-incident-alerts
+  group: pipeline-incident-${{ github.event.workflow_run.workflow_id }}-${{ github.event.workflow_run.head_branch }}
   cancel-in-progress: false
 jobs:
   notify:
