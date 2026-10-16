@@ -1,12 +1,7 @@
 name: Deploy canonical live site
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'release-assets/**'
-      - 'pinned-live-assets/**'
+  # Legacy host now redirects to Cloudflare. Never automatically overwrite it.
   workflow_dispatch:
 
 permissions:
@@ -17,7 +12,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  security-gate:
+    uses: ./.github/workflows/security-gate.yml
   deploy:
+    needs: security-gate
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
