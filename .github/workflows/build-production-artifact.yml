@@ -1,9 +1,7 @@
 name: Build production artifact
 
 on:
-  pull_request:
-    branches:
-      - main
+  # Legacy asset tools are manual; PR checks must not mutate proposed source.
   workflow_dispatch:
 
 permissions:

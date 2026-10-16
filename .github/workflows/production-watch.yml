@@ -1,0 +1,64 @@
+name: Production watch
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+  deployment_status:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: production-watch
+  cancel-in-progress: false
+jobs:
+  monitor:
+    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success' || github.event.deployment_status.state == 'failure' || github.event.deployment_status.state == 'error'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      # No repository checkout, dependency installation, credentials or customer data.
+      - uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        with:
+          script: |
+            const checks = [{ url: 'https://church-care-hub.church-care-hub.workers.dev/', type: 'html' }, { url: 'https://church-care-hub.church-care-hub.workers.dev/readyz', type: 'health' }];
+            const failures = [];
+            for (const check of checks) {
+              let passed = false;
+              for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                  const r = await fetch(check.url, {signal: AbortSignal.timeout(45000), redirect: 'error'});
+                  if (!r.ok) throw new Error('HTTP status');
+                  const text = await r.text();
+                  if (check.type === 'health') {
+                    if (text.trim().toLowerCase() !== 'ok') {
+                      const data = JSON.parse(text);
+                      if (data.ok !== true && data.status !== 'ok' && data.status !== 'healthy') throw new Error('Unhealthy response');
+                    }
+                  } else {
+                    if (!r.headers.get('content-type')?.includes('text/html') || !/<html/i.test(text)) throw new Error('Invalid page');
+                    const assets = [...text.matchAll(/(?:src|href)=["']([^"']+\.(?:js|css)(?:\?[^"']*)?)["']/g)].map(m => new URL(m[1], check.url)).filter(u => u.origin === new URL(check.url).origin);
+                    if (!assets.length) throw new Error('Missing application assets');
+                    for (const url of assets.slice(0, 8)) {
+                      const asset = await fetch(url, {signal: AbortSignal.timeout(15000), redirect: 'error'});
+                      if (!asset.ok || asset.headers.get('content-type')?.includes('text/html')) throw new Error('Broken application asset');
+                      await asset.arrayBuffer();
+                    }
+                  }
+                  passed = true; break;
+                } catch { if (attempt < 2) await new Promise(r => setTimeout(r, 10000)); }
+              }
+              if (!passed) failures.push(check.url);
+            }
+            const {owner, repo} = context.repo;
+            const title = '[Production incident] Availability or application assets';
+            const issues = await github.paginate(github.rest.issues.listForRepo, {owner, repo, state: 'open', creator: 'github-actions[bot]', per_page: 100});
+            const incident = issues.find(i => !i.pull_request && i.title === title);
+            const run = 'https://github.com/' + owner + '/' + repo + '/actions/runs/' + context.runId;
+            if (failures.length) {
+              if (!incident) await github.rest.issues.create({owner, repo, title, assignees: ['raliegh2'], body: 'Automated checks failed after three attempts.\n\nEndpoints: ' + failures.join(', ') + '\n\nEvidence: ' + run + '\n\nCheck hosting logs and recent releases. Do not post secrets or customer data. Restore a verified previous release if needed; confirm recovery before closing.'});
+              core.setFailed('Production checks failed. See tracked incident and this run.');
+            } else if (incident) {
+              await github.rest.issues.createComment({owner, repo, issue_number: incident.number, body: 'All configured external checks recovered. Evidence: ' + run + '. This checks public availability and assets, not authenticated user journeys or database correctness.'});
+              await github.rest.issues.update({owner, repo, issue_number: incident.number, state: 'closed', state_reason: 'completed'});
+            }
+            await core.summary.addHeading('Production availability').addRaw(failures.length ? 'FAILED: see incident.' : 'All configured checks passed.').write();
