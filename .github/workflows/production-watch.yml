@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 8
     steps:
       # No repository checkout, dependency installation, credentials or customer data.
-      - uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         with:
           script: |
             const checks = [{ url: 'https://church-care-hub.church-care-hub.workers.dev/', type: 'html' }, { url: 'https://church-care-hub.church-care-hub.workers.dev/readyz', type: 'health' }];
