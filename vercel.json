@@ -45,5 +45,11 @@
         }
       ]
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "main": false,
+      "migration/cloudflare": false
+    }
+  }
 }

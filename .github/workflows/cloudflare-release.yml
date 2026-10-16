@@ -1,0 +1,36 @@
+name: Verified Cloudflare release
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: production-cloudflare
+  cancel-in-progress: false
+jobs:
+  gate:
+    uses: ./.github/workflows/security-gate.yml
+  release:
+    needs: gate
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Require the migrated application
+        run: test -f wrangler.jsonc && test -d cloudflare
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build:cloudflare
+      - name: Deploy verified Worker without running database migrations
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo '::error::Configure the scoped production Cloudflare token'; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo '::error::Configure the Cloudflare account ID'; exit 1; }
+          npx --no-install wrangler deploy
