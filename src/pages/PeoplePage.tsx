@@ -10,7 +10,7 @@ import {
   StickyNote,
   UserRoundCheck,
 } from 'lucide-react';
-import { organizationId, supabase } from '../lib/supabase';
+import { organizationId, backend } from '../lib/backend';
 import type { AppRole, CareNote, Member, VisitRecord, Visitor } from '../types';
 
 type Person = Visitor | Member;
@@ -82,7 +82,7 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
     const table = type === 'visitor' ? 'visitors' : 'members';
     const request = ++peopleRequest.current;
     setLoadingPeople(true);
-    let builder = supabase.from(table).select('*').eq('organization_id', organizationId).eq('active', true);
+    let builder = backend.from(table).select('*').eq('organization_id', organizationId).eq('active', true);
     const fields = type === 'visitor' ? ['full_name', 'optional_contact', 'address'] : ['first_name', 'last_name', 'email', 'phone', 'address', 'ministry'];
     const terms = search.replace(/[^\p{L}\p{N}\s@.+_-]/gu, '').trim().slice(0, 120).split(/\s+/).filter(Boolean).slice(0, 6);
     for (const term of terms) builder = builder.or(fields.map(field => `${field}.ilike.%${term}%`).join(','));
@@ -112,8 +112,8 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
     }
     const key = type === 'visitor' ? 'visitor_id' : 'member_id';
     const [notesResult, visitsResult] = await Promise.all([
-      supabase.from('care_notes').select('*').eq('organization_id', organizationId).eq(key, personId).order('created_at', { ascending: false }).order('id', { ascending: false }).range(historyOffset * 100, historyOffset * 100 + 100),
-      supabase.from('visit_records').select('*').eq('organization_id', organizationId).eq(key, personId).order('visited_at', { ascending: false }).order('id', { ascending: false }).range(historyOffset * 100, historyOffset * 100 + 100),
+      backend.from('care_notes').select('*').eq('organization_id', organizationId).eq(key, personId).order('created_at', { ascending: false }).order('id', { ascending: false }).range(historyOffset * 100, historyOffset * 100 + 100),
+      backend.from('visit_records').select('*').eq('organization_id', organizationId).eq(key, personId).order('visited_at', { ascending: false }).order('id', { ascending: false }).range(historyOffset * 100, historyOffset * 100 + 100),
     ]);
     if (request !== careRequest.current) return;
     setLoadingHistory(false);
@@ -146,7 +146,7 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
       visibility: type === 'visitor' ? 'assigned_team' : 'pastoral_team',
       created_by: userId,
     };
-    const { error } = await supabase.from('care_notes').upsert({ ...payload, id: writeId('note', payload) }, { onConflict: 'id', ignoreDuplicates: true });
+    const { error } = await backend.from('care_notes').upsert({ ...payload, id: writeId('note', payload) }, { onConflict: 'id', ignoreDuplicates: true });
     setIsError(Boolean(error));
     setMessage(error ? error.message : 'Support note saved.');
     if (!error) { pendingWrites.current.delete('note'); await loadCareRecord(selected.id); }
@@ -155,7 +155,7 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
 
   async function resolveNote(note: CareNote) {
     const nextStatus = note.status === 'resolved' ? 'open' : 'resolved';
-    const { error } = await supabase.from('care_notes').update({
+    const { error } = await backend.from('care_notes').update({
       status: nextStatus,
       resolved_at: nextStatus === 'resolved' ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
@@ -182,9 +182,9 @@ export function PeoplePage({ type, userId, role }: { type: PersonType; userId: s
       outcome,
       summary: summary.trim() || null,
     };
-    const { error } = await supabase.from('visit_records').upsert({ ...payload, id: writeId('visit', payload) }, { onConflict: 'id', ignoreDuplicates: true });
+    const { error } = await backend.from('visit_records').upsert({ ...payload, id: writeId('visit', payload) }, { onConflict: 'id', ignoreDuplicates: true });
     if (!error && type === 'member') {
-      await supabase.from('members').update({ last_contact_at: visitTimestamp.toISOString() }).eq('id', selected.id);
+      await backend.from('members').update({ last_contact_at: visitTimestamp.toISOString() }).eq('id', selected.id);
     }
     setIsError(Boolean(error));
     setMessage(error ? error.message : 'Visit recorded in the shared care history.');
@@ -487,8 +487,8 @@ function PersonForm({
 
     const table = type === 'visitor' ? 'visitors' : 'members';
     const result = person
-      ? await supabase.from(table).update(payload).eq('id', person.id).select('id').single()
-      : await supabase.from(table).insert({ ...payload, organization_id: organizationId, created_by: userId }).select('id').single();
+      ? await backend.from(table).update(payload).eq('id', person.id).select('id').single()
+      : await backend.from(table).insert({ ...payload, organization_id: organizationId, created_by: userId }).select('id').single();
     setBusy(false);
     if (result.error) {
       setError(result.error.message);

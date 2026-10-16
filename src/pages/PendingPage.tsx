@@ -1,5 +1,5 @@
 import { Brand } from '../components/Brand';
-import { supabase } from '../lib/supabase';
+import { backend } from '../lib/backend';
 import type { RoleStatus } from '../types';
 
 export function PendingPage({ status, active }: { status: RoleStatus; active: boolean }) {
@@ -20,7 +20,7 @@ export function PendingPage({ status, active }: { status: RoleStatus; active: bo
         <Brand />
         <h1>{title}</h1>
         <p>{message}</p>
-        <button className="secondary" onClick={() => void supabase.auth.signOut()}>Sign out</button>
+        <button className="secondary" onClick={() => void backend.auth.signOut()}>Sign out</button>
       </section>
     </main>
   );

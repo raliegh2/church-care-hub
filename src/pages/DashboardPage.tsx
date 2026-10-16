@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, Cake, CalendarCheck2, Clock3, ContactRound, HandHeart, Sunset, Users } from 'lucide-react';
 import { formatBirthday, getBirthdayPipeline, memberName, type MemberBirthday } from '../lib/birthdays';
 import { getDashboardGreeting } from '../lib/greeting';
-import { organizationId, supabase } from '../lib/supabase';
+import { organizationId, backend } from '../lib/backend';
 import { useCountUp } from '../lib/useCountUp';
 import type { AppPage } from '../lib/permissions';
 import type { AppRole, CareNote, Member } from '../types';
@@ -87,7 +87,7 @@ export function DashboardPage({
       return;
     }
     let active = true;
-    void supabase.from('members')
+    void backend.from('members')
       .select('id,organization_id,first_name,last_name,birth_date,active,created_by,created_at')
       .eq('organization_id', organizationId)
       .eq('active', true)
@@ -107,12 +107,12 @@ export function DashboardPage({
       const eightWeeksAgo = new Date(Date.now() - 56 * 86_400_000).toISOString();
 
       const [visitors, visitorCare, visitorVisits, newVisitors, recent, trend] = await Promise.all([
-        supabase.from('visitors').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).eq('active', true),
-        supabase.from('care_notes').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).not('visitor_id', 'is', null).neq('status', 'resolved'),
-        supabase.from('visit_records').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).not('visitor_id', 'is', null),
-        supabase.from('visitors').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).eq('active', true).gte('created_at', monthStart),
-        supabase.from('visitors').select('id, full_name, first_visit_date, created_at').eq('organization_id', organizationId).eq('active', true).order('created_at', { ascending: false }).limit(5),
-        supabase.from('visitors').select('created_at').eq('organization_id', organizationId).gte('created_at', eightWeeksAgo),
+        backend.from('visitors').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).eq('active', true),
+        backend.from('care_notes').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).not('visitor_id', 'is', null).neq('status', 'resolved'),
+        backend.from('visit_records').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).not('visitor_id', 'is', null),
+        backend.from('visitors').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).eq('active', true).gte('created_at', monthStart),
+        backend.from('visitors').select('id, full_name, first_visit_date, created_at').eq('organization_id', organizationId).eq('active', true).order('created_at', { ascending: false }).limit(5),
+        backend.from('visitors').select('created_at').eq('organization_id', organizationId).gte('created_at', eightWeeksAgo),
       ]);
 
       if (!active) return;
@@ -136,10 +136,10 @@ export function DashboardPage({
       }
 
       const [members, care, visits, notesResult] = await Promise.all([
-        supabase.from('members').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).eq('active', true),
-        supabase.from('care_notes').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).neq('status', 'resolved'),
-        supabase.from('visit_records').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId),
-        supabase
+        backend.from('members').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).eq('active', true),
+        backend.from('care_notes').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId).neq('status', 'resolved'),
+        backend.from('visit_records').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId),
+        backend
           .from('care_notes')
           .select('id, note_text, note_type, visitor_id, member_id, created_at')
           .eq('organization_id', organizationId)
@@ -157,8 +157,8 @@ export function DashboardPage({
       const memberIds = [...new Set(notes.map(note => note.member_id).filter(Boolean))] as string[];
       const visitorIds = [...new Set(notes.map(note => note.visitor_id).filter(Boolean))] as string[];
       const [memberRows, visitorRows] = await Promise.all([
-        supabase.from('members').select('id, first_name, last_name').eq('organization_id', organizationId).in('id', memberIds.length ? memberIds : [EMPTY_UUID]),
-        supabase.from('visitors').select('id, full_name').eq('organization_id', organizationId).in('id', visitorIds.length ? visitorIds : [EMPTY_UUID]),
+        backend.from('members').select('id, first_name, last_name').eq('organization_id', organizationId).in('id', memberIds.length ? memberIds : [EMPTY_UUID]),
+        backend.from('visitors').select('id, full_name').eq('organization_id', organizationId).in('id', visitorIds.length ? visitorIds : [EMPTY_UUID]),
       ]);
 
       if (!active) return;

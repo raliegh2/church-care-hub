@@ -1,11 +1,11 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import type { Session } from '@supabase/supabase-js';
+import type { Session } from './lib/backend';
 import { AppShell } from './components/AppShell';
 import { Loading } from './components/Loading';
 import { SiteCredit } from './components/SiteCredit';
 import { authCallback, clearAuthCallbackFromUrl, describeAuthCallbackError } from './lib/authCallback';
 import { canAccessPage, type AppPage } from './lib/permissions';
-import { supabase } from './lib/supabase';
+import { backend, recoveryToken } from './lib/backend';
 const AdminPage = lazy(() => import('./pages/AdminPage').then(module => ({ default: module.AdminPage })));
 const AttendancePage = lazy(() => import('./pages/AttendancePage').then(module => ({ default: module.AttendancePage })));
 import { AuthPage, type AuthNotice } from './pages/AuthPage';
@@ -19,7 +19,7 @@ import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import type { UserProfile } from './types';
 
 /** A recovery link that arrived with credentials the client can still redeem. */
-const arrivedFromRecoveryLink = authCallback.type === 'recovery' && authCallback.hasToken;
+const arrivedFromRecoveryLink = Boolean(recoveryToken) || (authCallback.type === 'recovery' && authCallback.hasToken);
 
 function initialNotice(): AuthNotice | null {
   const failure = describeAuthCallbackError(authCallback);
@@ -70,7 +70,7 @@ export default function App() {
     setLoading(true);
     try {
       const { data, error } = await Promise.race([
-        supabase.from('user_profiles').select('*').eq('id', current.user.id).maybeSingle(),
+        backend.from('user_profiles').select('*').eq('id', current.user.id).maybeSingle(),
         timeoutAfter(8000),
       ]);
       if (request !== profileRequest.current) return;
@@ -97,7 +97,7 @@ export default function App() {
       if (active) setLoading(false);
     }, 5000);
 
-    void Promise.race([supabase.auth.getSession(), timeoutAfter(4000)])
+    void Promise.race([backend.auth.getSession(), timeoutAfter(4000)])
       .then(({ data, error }) => {
         if (error) throw error;
         if (!active) return;
@@ -105,7 +105,7 @@ export default function App() {
         setLoading(false);
         if (data.session) {
           void loadProfile(data.session);
-        } else if (arrivedFromRecoveryLink) {
+        } else if (arrivedFromRecoveryLink && !recoveryToken) {
           // The link carried credentials but no session came of them, so the
           // password was not changed. Say so instead of showing a bare form.
           setRecovering(false);
@@ -126,7 +126,7 @@ export default function App() {
       })
       .finally(() => window.clearTimeout(fallback));
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, next) => {
+    const { data: { subscription } } = backend.auth.onAuthStateChange((event, next) => {
       if (!active) return;
       if (event === 'PASSWORD_RECOVERY') setRecovering(true);
       setSession(next);
@@ -156,10 +156,11 @@ export default function App() {
    * the sign-in throttle has just been cleared, rather than days later.
    */
   const finishRecovery = useCallback(async (text: string, isError: boolean) => {
+    window.history.replaceState(null, '', '/');
     setRecovering(false);
     setNotice({ text, isError });
     try {
-      await supabase.auth.signOut({ scope: 'local' });
+      await backend.auth.signOut({ scope: 'local' });
     } catch {
       // The recovery session may already have been revoked by the password
       // change. Clearing local state below returns the person to sign-in
@@ -171,9 +172,10 @@ export default function App() {
   }, []);
 
   if (loading) return <SitePage><Loading /></SitePage>;
+  if (recovering && recoveryToken) return <SitePage><ResetPasswordPage onComplete={finishRecovery} /></SitePage>;
   if (!session) return <SitePage><AuthPage notice={notice} /></SitePage>;
   if (recovering) return <SitePage><ResetPasswordPage onComplete={finishRecovery} /></SitePage>;
-  if (profileError) return <SitePage><section className="panel" role="alert"><p>{profileError}</p><button className="primary" onClick={() => void loadProfile(session)}>Retry</button><button className="secondary" onClick={() => void supabase.auth.signOut()}>Sign out</button></section></SitePage>;
+  if (profileError) return <SitePage><section className="panel" role="alert"><p>{profileError}</p><button className="primary" onClick={() => void loadProfile(session)}>Retry</button><button className="secondary" onClick={() => void backend.auth.signOut()}>Sign out</button></section></SitePage>;
   if (!profile) {
     return (
       <SitePage>
@@ -195,7 +197,7 @@ export default function App() {
 
   return (
     <SitePage>
-      <AppShell profile={profile} page={safePage} setPage={selectPage} signOut={() => void supabase.auth.signOut()}>
+      <AppShell profile={profile} page={safePage} setPage={selectPage} signOut={() => void backend.auth.signOut()}>
         <Suspense fallback={<Loading />}>
         {safePage === 'dashboard' && (
           <DashboardPage

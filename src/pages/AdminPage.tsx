@@ -10,7 +10,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { backend } from '../lib/backend';
 import { useCountUp } from '../lib/useCountUp';
 import type { AppRole, UserProfile } from '../types';
 
@@ -36,12 +36,12 @@ export function AdminPage({ userId }: { userId: string }) {
   const load = useCallback(async () => {
     setMessage('');
     const [usersResult, visitors, members, visits, needs, attendance] = await Promise.all([
-      supabase.from('user_profiles').select('*').order('created_at', { ascending: false }),
-      supabase.from('visitors').select('id', { count: 'exact', head: true }),
-      supabase.from('members').select('id', { count: 'exact', head: true }),
-      supabase.from('visit_records').select('id', { count: 'exact', head: true }),
-      supabase.from('care_notes').select('id', { count: 'exact', head: true }).neq('status', 'resolved'),
-      supabase.from('attendance_sessions').select('id', { count: 'exact', head: true }),
+      backend.from('user_profiles').select('*').order('created_at', { ascending: false }),
+      backend.from('visitors').select('id', { count: 'exact', head: true }),
+      backend.from('members').select('id', { count: 'exact', head: true }),
+      backend.from('visit_records').select('id', { count: 'exact', head: true }),
+      backend.from('care_notes').select('id', { count: 'exact', head: true }).neq('status', 'resolved'),
+      backend.from('attendance_sessions').select('id', { count: 'exact', head: true }),
     ]);
     const error = usersResult.error || visitors.error || members.error || visits.error || needs.error || attendance.error;
     if (error) {
@@ -67,7 +67,7 @@ export function AdminPage({ userId }: { userId: string }) {
 
   async function decide(id: string, approve: boolean) {
     setBusyUser(id);
-    const { error } = await supabase.rpc('approve_role_request', { p_user_id: id, p_approve: approve });
+    const { error } = await backend.rpc('approve_role_request', { p_user_id: id, p_approve: approve });
     setBusyUser(null);
     setIsError(Boolean(error));
     setMessage(error ? error.message : approve ? 'Pastor access approved.' : 'Pastor request rejected.');
@@ -76,7 +76,7 @@ export function AdminPage({ userId }: { userId: string }) {
 
   async function manageUser(user: UserProfile, role: AppRole, active: boolean) {
     setBusyUser(user.id);
-    const { error } = await supabase.rpc('admin_manage_user', {
+    const { error } = await backend.rpc('admin_manage_user', {
       p_user_id: user.id,
       p_role: role,
       p_active: active,

@@ -1,0 +1,3036 @@
+{
+  "project_ref": "vzjcudzsheiszdailwns",
+  "catalog": [
+    {
+      "table": "legacy_profiles",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "full_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "email",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "legacy_app_role",
+          "name": "role",
+          "type": "USER-DEFINED",
+          "default": "'usher'::legacy_app_role",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "bool",
+          "name": "is_active",
+          "type": "boolean",
+          "default": "true",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "u",
+          "name": "profiles_email_key",
+          "definition": "UNIQUE (email)"
+        },
+        {
+          "kind": "f",
+          "name": "profiles_id_fkey",
+          "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "p",
+          "name": "profiles_pkey",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "table": "legacy_people",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "first_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "last_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "phone",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "email",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "address",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "person_type",
+          "type": "text",
+          "default": "'visitor'::text",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "date",
+          "name": "first_visit_date",
+          "type": "date",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "notes",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "bool",
+          "name": "consent_to_contact",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "people_created_by_fkey",
+          "definition": "FOREIGN KEY (created_by) REFERENCES legacy_profiles(id) ON DELETE SET NULL"
+        },
+        {
+          "kind": "c",
+          "name": "people_person_type_check",
+          "definition": "CHECK ((person_type = ANY (ARRAY['visitor'::text, 'member'::text])))"
+        },
+        {
+          "kind": "p",
+          "name": "people_pkey",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "table": "legacy_services",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "date",
+          "name": "service_date",
+          "type": "date",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "time",
+          "name": "start_time",
+          "type": "time without time zone",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "time",
+          "name": "end_time",
+          "type": "time without time zone",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "location",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "notes",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "services_created_by_fkey",
+          "definition": "FOREIGN KEY (created_by) REFERENCES legacy_profiles(id) ON DELETE SET NULL"
+        },
+        {
+          "kind": "p",
+          "name": "services_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "u",
+          "name": "services_title_service_date_start_time_key",
+          "definition": "UNIQUE (title, service_date, start_time)"
+        }
+      ]
+    },
+    {
+      "table": "legacy_attendance_records",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "service_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "person_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "status",
+          "type": "text",
+          "default": "'present'::text",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "checked_in_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "checked_in_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "notes",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "attendance_records_checked_in_by_fkey",
+          "definition": "FOREIGN KEY (checked_in_by) REFERENCES legacy_profiles(id) ON DELETE SET NULL"
+        },
+        {
+          "kind": "f",
+          "name": "attendance_records_person_id_fkey",
+          "definition": "FOREIGN KEY (person_id) REFERENCES legacy_people(id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "p",
+          "name": "attendance_records_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "f",
+          "name": "attendance_records_service_id_fkey",
+          "definition": "FOREIGN KEY (service_id) REFERENCES legacy_services(id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "u",
+          "name": "attendance_records_service_id_person_id_key",
+          "definition": "UNIQUE (service_id, person_id)"
+        },
+        {
+          "kind": "c",
+          "name": "attendance_records_status_check",
+          "definition": "CHECK ((status = ANY (ARRAY['present'::text, 'absent'::text, 'excused'::text])))"
+        }
+      ]
+    },
+    {
+      "table": "legacy_audit_logs",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "actor_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "action",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "entity_type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "entity_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "jsonb",
+          "name": "metadata",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "audit_logs_actor_id_fkey",
+          "definition": "FOREIGN KEY (actor_id) REFERENCES legacy_profiles(id) ON DELETE SET NULL"
+        },
+        {
+          "kind": "p",
+          "name": "audit_logs_pkey",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "table": "legacy_follow_ups",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "person_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "assigned_to",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "date",
+          "name": "due_date",
+          "type": "date",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "status",
+          "type": "text",
+          "default": "'open'::text",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "notes",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "follow_ups_assigned_to_fkey",
+          "definition": "FOREIGN KEY (assigned_to) REFERENCES legacy_profiles(id) ON DELETE SET NULL"
+        },
+        {
+          "kind": "f",
+          "name": "follow_ups_created_by_fkey",
+          "definition": "FOREIGN KEY (created_by) REFERENCES legacy_profiles(id) ON DELETE SET NULL"
+        },
+        {
+          "kind": "f",
+          "name": "follow_ups_person_id_fkey",
+          "definition": "FOREIGN KEY (person_id) REFERENCES legacy_people(id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "p",
+          "name": "follow_ups_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "c",
+          "name": "follow_ups_status_check",
+          "definition": "CHECK ((status = ANY (ARRAY['open'::text, 'completed'::text, 'cancelled'::text])))"
+        }
+      ]
+    },
+    {
+      "table": "organization_settings",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "int4",
+          "name": "visitor_retention_months",
+          "type": "integer",
+          "default": "24",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "int4",
+          "name": "contact_retention_months",
+          "type": "integer",
+          "default": "12",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "int4",
+          "name": "attendance_retention_months",
+          "type": "integer",
+          "default": "36",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "int4",
+          "name": "audit_retention_months",
+          "type": "integer",
+          "default": "24",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "int4",
+          "name": "not_seen_days",
+          "type": "integer",
+          "default": "30",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "bool",
+          "name": "require_service_assignment",
+          "type": "boolean",
+          "default": "true",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "updated_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "organization_settings_attendance_retention_months_check",
+          "definition": "CHECK (((attendance_retention_months >= 1) AND (attendance_retention_months <= 120)))"
+        },
+        {
+          "kind": "c",
+          "name": "organization_settings_audit_retention_months_check",
+          "definition": "CHECK (((audit_retention_months >= 6) AND (audit_retention_months <= 120)))"
+        },
+        {
+          "kind": "c",
+          "name": "organization_settings_contact_retention_months_check",
+          "definition": "CHECK (((contact_retention_months >= 1) AND (contact_retention_months <= 120)))"
+        },
+        {
+          "kind": "c",
+          "name": "organization_settings_not_seen_days_check",
+          "definition": "CHECK (((not_seen_days >= 7) AND (not_seen_days <= 730)))"
+        },
+        {
+          "kind": "f",
+          "name": "organization_settings_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "p",
+          "name": "organization_settings_pkey",
+          "definition": "PRIMARY KEY (organization_id)"
+        },
+        {
+          "kind": "f",
+          "name": "organization_settings_updated_by_fkey",
+          "definition": "FOREIGN KEY (updated_by) REFERENCES user_profiles(id) ON DELETE SET NULL"
+        },
+        {
+          "kind": "c",
+          "name": "organization_settings_visitor_retention_months_check",
+          "definition": "CHECK (((visitor_retention_months >= 1) AND (visitor_retention_months <= 120)))"
+        }
+      ]
+    },
+    {
+      "table": "services",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "service_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "date",
+          "name": "service_date",
+          "type": "date",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "time",
+          "name": "start_time",
+          "type": "time without time zone",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "bool",
+          "name": "active",
+          "type": "boolean",
+          "default": "true",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "services_created_by_fkey1",
+          "definition": "FOREIGN KEY (created_by) REFERENCES user_profiles(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "services_created_by_same_org",
+          "definition": "FOREIGN KEY (organization_id, created_by) REFERENCES user_profiles(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "u",
+          "name": "services_org_id_unique",
+          "definition": "UNIQUE (organization_id, id)"
+        },
+        {
+          "kind": "f",
+          "name": "services_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "u",
+          "name": "services_organization_id_service_name_service_date_start_ti_key",
+          "definition": "UNIQUE (organization_id, service_name, service_date, start_time)"
+        },
+        {
+          "kind": "p",
+          "name": "services_pkey1",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "c",
+          "name": "services_service_name_check",
+          "definition": "CHECK (((char_length(btrim(service_name)) >= 2) AND (char_length(btrim(service_name)) <= 100)))"
+        }
+      ]
+    },
+    {
+      "table": "service_assignments",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "service_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "assigned_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "assignments_actor_same_org",
+          "definition": "FOREIGN KEY (organization_id, assigned_by) REFERENCES user_profiles(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "assignments_service_same_org",
+          "definition": "FOREIGN KEY (organization_id, service_id) REFERENCES services(organization_id, id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "f",
+          "name": "assignments_user_same_org",
+          "definition": "FOREIGN KEY (organization_id, user_id) REFERENCES user_profiles(organization_id, id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "f",
+          "name": "service_assignments_assigned_by_fkey",
+          "definition": "FOREIGN KEY (assigned_by) REFERENCES user_profiles(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "service_assignments_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "p",
+          "name": "service_assignments_pkey",
+          "definition": "PRIMARY KEY (service_id, user_id)"
+        },
+        {
+          "kind": "f",
+          "name": "service_assignments_service_id_fkey",
+          "definition": "FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "f",
+          "name": "service_assignments_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES user_profiles(id) ON DELETE CASCADE"
+        }
+      ]
+    },
+    {
+      "table": "attendance",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "visitor_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "service_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "checked_in_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "checked_in_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "voided_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "voided_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "void_reason",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "attendance_actor_same_org",
+          "definition": "FOREIGN KEY (organization_id, checked_in_by) REFERENCES user_profiles(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "attendance_checked_in_by_fkey",
+          "definition": "FOREIGN KEY (checked_in_by) REFERENCES user_profiles(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "attendance_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "p",
+          "name": "attendance_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "f",
+          "name": "attendance_service_id_fkey",
+          "definition": "FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "attendance_service_same_org",
+          "definition": "FOREIGN KEY (organization_id, service_id) REFERENCES services(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "u",
+          "name": "attendance_single_checkin",
+          "definition": "UNIQUE (organization_id, visitor_id, service_id)"
+        },
+        {
+          "kind": "f",
+          "name": "attendance_visitor_id_fkey",
+          "definition": "FOREIGN KEY (visitor_id) REFERENCES visitors(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "attendance_visitor_same_org",
+          "definition": "FOREIGN KEY (organization_id, visitor_id) REFERENCES visitors(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "attendance_void_actor_same_org",
+          "definition": "FOREIGN KEY (organization_id, voided_by) REFERENCES user_profiles(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "c",
+          "name": "attendance_void_consistency",
+          "definition": "CHECK ((((voided_at IS NULL) AND (voided_by IS NULL) AND (void_reason IS NULL)) OR ((voided_at IS NOT NULL) AND (voided_by IS NOT NULL) AND (void_reason IS NOT NULL))))"
+        },
+        {
+          "kind": "c",
+          "name": "attendance_void_reason_check",
+          "definition": "CHECK (((void_reason IS NULL) OR ((char_length(btrim(void_reason)) >= 8) AND (char_length(btrim(void_reason)) <= 240))))"
+        },
+        {
+          "kind": "f",
+          "name": "attendance_voided_by_fkey",
+          "definition": "FOREIGN KEY (voided_by) REFERENCES user_profiles(id) ON DELETE RESTRICT"
+        }
+      ]
+    },
+    {
+      "table": "audit_logs",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "actor_user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "action",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "resource_type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "resource_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "event_timestamp",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "outcome",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "jsonb",
+          "name": "safe_metadata",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "audit_logs_action_check",
+          "definition": "CHECK (((char_length(action) >= 3) AND (char_length(action) <= 80)))"
+        },
+        {
+          "kind": "f",
+          "name": "audit_logs_actor_user_id_fkey",
+          "definition": "FOREIGN KEY (actor_user_id) REFERENCES user_profiles(id) ON DELETE SET NULL"
+        },
+        {
+          "kind": "f",
+          "name": "audit_logs_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "c",
+          "name": "audit_logs_outcome_check",
+          "definition": "CHECK ((outcome = ANY (ARRAY['success'::text, 'denied'::text, 'failure'::text])))"
+        },
+        {
+          "kind": "p",
+          "name": "audit_logs_pkey1",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "c",
+          "name": "audit_logs_resource_type_check",
+          "definition": "CHECK (((char_length(resource_type) >= 2) AND (char_length(resource_type) <= 80)))"
+        },
+        {
+          "kind": "c",
+          "name": "audit_logs_safe_metadata_check",
+          "definition": "CHECK ((jsonb_typeof(safe_metadata) = 'object'::text))"
+        }
+      ]
+    },
+    {
+      "table": "retention_actions",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "retention_action_type",
+          "name": "action_type",
+          "type": "USER-DEFINED",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "visitor_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "performed_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "performed_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "reason",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "retention_actions_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "retention_actions_performed_by_fkey",
+          "definition": "FOREIGN KEY (performed_by) REFERENCES user_profiles(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "p",
+          "name": "retention_actions_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "c",
+          "name": "retention_actions_reason_check",
+          "definition": "CHECK (((char_length(btrim(reason)) >= 10) AND (char_length(btrim(reason)) <= 240)))"
+        },
+        {
+          "kind": "f",
+          "name": "retention_actions_visitor_id_fkey",
+          "definition": "FOREIGN KEY (visitor_id) REFERENCES visitors(id) ON DELETE SET NULL"
+        },
+        {
+          "kind": "f",
+          "name": "retention_actor_same_org",
+          "definition": "FOREIGN KEY (organization_id, performed_by) REFERENCES user_profiles(organization_id, id) ON DELETE RESTRICT"
+        }
+      ]
+    },
+    {
+      "table": "organizations",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "organizations_name_check",
+          "definition": "CHECK (((char_length(btrim(name)) >= 2) AND (char_length(btrim(name)) <= 120)))"
+        },
+        {
+          "kind": "p",
+          "name": "organizations_pkey",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "table": "admin_signup_notifications",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "notified_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "p",
+          "name": "admin_signup_notifications_pkey",
+          "definition": "PRIMARY KEY (user_id)"
+        },
+        {
+          "kind": "f",
+          "name": "admin_signup_notifications_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ]
+    },
+    {
+      "table": "attendance_sessions",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "service_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "date",
+          "name": "service_date",
+          "type": "date",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "time",
+          "name": "service_time",
+          "type": "time without time zone",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "int4",
+          "name": "new_visitors",
+          "type": "integer",
+          "default": "0",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "int4",
+          "name": "returning_visitors",
+          "type": "integer",
+          "default": "0",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "int4",
+          "name": "total_attendance",
+          "type": "integer",
+          "default": null,
+          "nullable": "YES",
+          "generated": "ALWAYS",
+          "generation": "(new_visitors + returning_visitors)"
+        },
+        {
+          "udt": "text",
+          "name": "notes",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "attendance_sessions_created_by_fkey",
+          "definition": "FOREIGN KEY (created_by) REFERENCES user_profiles(id)"
+        },
+        {
+          "kind": "c",
+          "name": "attendance_sessions_new_visitors_check",
+          "definition": "CHECK ((new_visitors >= 0))"
+        },
+        {
+          "kind": "f",
+          "name": "attendance_sessions_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "p",
+          "name": "attendance_sessions_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "c",
+          "name": "attendance_sessions_returning_visitors_check",
+          "definition": "CHECK ((returning_visitors >= 0))"
+        }
+      ]
+    },
+    {
+      "table": "visitors",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "full_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "preferred_name",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "date",
+          "name": "first_visit_date",
+          "type": "date",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "optional_contact",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "bool",
+          "name": "contact_consent",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "bool",
+          "name": "active",
+          "type": "boolean",
+          "default": "true",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "anonymized_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "address",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "visitors_anonymized_state",
+          "definition": "CHECK (((anonymized_at IS NULL) OR ((active = false) AND (optional_contact IS NULL) AND (contact_consent = false))))"
+        },
+        {
+          "kind": "c",
+          "name": "visitors_contact_requires_consent",
+          "definition": "CHECK (((optional_contact IS NULL) OR (contact_consent = true)))"
+        },
+        {
+          "kind": "f",
+          "name": "visitors_created_by_fkey",
+          "definition": "FOREIGN KEY (created_by) REFERENCES user_profiles(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "visitors_created_by_same_org",
+          "definition": "FOREIGN KEY (organization_id, created_by) REFERENCES user_profiles(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "c",
+          "name": "visitors_full_name_check",
+          "definition": "CHECK (((char_length(btrim(full_name)) >= 2) AND (char_length(btrim(full_name)) <= 100)))"
+        },
+        {
+          "kind": "c",
+          "name": "visitors_optional_contact_check",
+          "definition": "CHECK (((optional_contact IS NULL) OR (char_length(optional_contact) <= 120)))"
+        },
+        {
+          "kind": "u",
+          "name": "visitors_org_id_unique",
+          "definition": "UNIQUE (organization_id, id)"
+        },
+        {
+          "kind": "f",
+          "name": "visitors_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "p",
+          "name": "visitors_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "c",
+          "name": "visitors_preferred_name_check",
+          "definition": "CHECK (((preferred_name IS NULL) OR ((char_length(btrim(preferred_name)) >= 1) AND (char_length(btrim(preferred_name)) <= 60))))"
+        }
+      ]
+    },
+    {
+      "table": "user_profiles",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "display_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "app_role",
+          "name": "role",
+          "type": "USER-DEFINED",
+          "default": "'usher'::app_role",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "bool",
+          "name": "active",
+          "type": "boolean",
+          "default": "true",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "auth_not_before",
+          "type": "timestamp with time zone",
+          "default": "'1970-01-01 00:00:00+00'::timestamp with time zone",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "app_role",
+          "name": "requested_role",
+          "type": "USER-DEFINED",
+          "default": "'usher'::app_role",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "role_status",
+          "type": "text",
+          "default": "'approved'::text",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "clerk_user_id",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "user_profiles_display_name_check",
+          "definition": "CHECK (((char_length(btrim(display_name)) >= 2) AND (char_length(btrim(display_name)) <= 80)))"
+        },
+        {
+          "kind": "u",
+          "name": "user_profiles_org_id_unique",
+          "definition": "UNIQUE (organization_id, id)"
+        },
+        {
+          "kind": "f",
+          "name": "user_profiles_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "p",
+          "name": "user_profiles_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "c",
+          "name": "user_profiles_role_status_check",
+          "definition": "CHECK ((role_status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text])))"
+        }
+      ]
+    },
+    {
+      "table": "members",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "first_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "last_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "email",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "phone",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "address",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "membership_status",
+          "type": "text",
+          "default": "'active'::text",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "last_contact_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "imported_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "import_batch_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "ministry",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "date",
+          "name": "joined_date",
+          "type": "date",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "bool",
+          "name": "active",
+          "type": "boolean",
+          "default": "true",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "date",
+          "name": "birth_date",
+          "type": "date",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "members_created_by_same_org",
+          "definition": "FOREIGN KEY (organization_id, created_by) REFERENCES user_profiles(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "c",
+          "name": "members_membership_status_check",
+          "definition": "CHECK ((membership_status = ANY (ARRAY['active'::text, 'inactive'::text, 'prospective'::text])))"
+        },
+        {
+          "kind": "f",
+          "name": "members_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "p",
+          "name": "members_pkey",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "table": "care_notes",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "visitor_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "member_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "note_text",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "status",
+          "type": "text",
+          "default": "'open'::text",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "visibility",
+          "type": "text",
+          "default": "'pastoral_team'::text",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "note_type",
+          "type": "text",
+          "default": "'care'::text",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "resolved_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "care_notes_actor_same_org",
+          "definition": "FOREIGN KEY (organization_id, created_by) REFERENCES user_profiles(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "care_notes_member_same_org",
+          "definition": "FOREIGN KEY (organization_id, member_id) REFERENCES members(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "c",
+          "name": "care_notes_note_text_check",
+          "definition": "CHECK (((char_length(btrim(note_text)) >= 2) AND (char_length(btrim(note_text)) <= 2000)))"
+        },
+        {
+          "kind": "c",
+          "name": "care_notes_one_person",
+          "definition": "CHECK (((visitor_id IS NULL) <> (member_id IS NULL)))"
+        },
+        {
+          "kind": "f",
+          "name": "care_notes_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "p",
+          "name": "care_notes_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "c",
+          "name": "care_notes_status_check",
+          "definition": "CHECK ((status = ANY (ARRAY['open'::text, 'resolved'::text])))"
+        },
+        {
+          "kind": "c",
+          "name": "care_notes_visibility_check",
+          "definition": "CHECK ((visibility = ANY (ARRAY['assigned_team'::text, 'pastoral_team'::text, 'administrator'::text])))"
+        },
+        {
+          "kind": "f",
+          "name": "care_notes_visitor_same_org",
+          "definition": "FOREIGN KEY (organization_id, visitor_id) REFERENCES visitors(organization_id, id) ON DELETE RESTRICT"
+        }
+      ]
+    },
+    {
+      "table": "visit_records",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "visitor_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "member_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "visited_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "visited_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "outcome",
+          "type": "text",
+          "default": "'completed'::text",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "summary",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "visit_records_actor_same_org",
+          "definition": "FOREIGN KEY (organization_id, visited_by) REFERENCES user_profiles(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "f",
+          "name": "visit_records_member_same_org",
+          "definition": "FOREIGN KEY (organization_id, member_id) REFERENCES members(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "c",
+          "name": "visit_records_one_person",
+          "definition": "CHECK (((visitor_id IS NULL) <> (member_id IS NULL)))"
+        },
+        {
+          "kind": "f",
+          "name": "visit_records_organization_id_fkey",
+          "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "c",
+          "name": "visit_records_outcome_check",
+          "definition": "CHECK (((char_length(btrim(outcome)) >= 2) AND (char_length(btrim(outcome)) <= 120)))"
+        },
+        {
+          "kind": "p",
+          "name": "visit_records_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "f",
+          "name": "visit_records_visitor_same_org",
+          "definition": "FOREIGN KEY (organization_id, visitor_id) REFERENCES visitors(organization_id, id) ON DELETE RESTRICT"
+        }
+      ]
+    },
+    {
+      "table": "pastor_applications",
+      "columns": [
+        {
+          "udt": "uuid",
+          "name": "profile_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "organization_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "church_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "pastor_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "district",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "denomination",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "church_phone",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "submitted_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "reviewed_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "uuid",
+          "name": "reviewed_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "text",
+          "name": "verification_notes",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "pastor_application_profile_same_org",
+          "definition": "FOREIGN KEY (organization_id, profile_id) REFERENCES user_profiles(organization_id, id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "f",
+          "name": "pastor_application_reviewer_same_org",
+          "definition": "FOREIGN KEY (organization_id, reviewed_by) REFERENCES user_profiles(organization_id, id) ON DELETE RESTRICT"
+        },
+        {
+          "kind": "c",
+          "name": "pastor_applications_church_name_check",
+          "definition": "CHECK (((char_length(btrim(church_name)) >= 2) AND (char_length(btrim(church_name)) <= 160)))"
+        },
+        {
+          "kind": "c",
+          "name": "pastor_applications_church_phone_check",
+          "definition": "CHECK (((char_length(btrim(church_phone)) >= 7) AND (char_length(btrim(church_phone)) <= 40)))"
+        },
+        {
+          "kind": "c",
+          "name": "pastor_applications_denomination_check",
+          "definition": "CHECK (((char_length(btrim(denomination)) >= 2) AND (char_length(btrim(denomination)) <= 120)))"
+        },
+        {
+          "kind": "c",
+          "name": "pastor_applications_district_check",
+          "definition": "CHECK (((char_length(btrim(district)) >= 2) AND (char_length(btrim(district)) <= 120)))"
+        },
+        {
+          "kind": "c",
+          "name": "pastor_applications_pastor_name_check",
+          "definition": "CHECK (((char_length(btrim(pastor_name)) >= 2) AND (char_length(btrim(pastor_name)) <= 120)))"
+        },
+        {
+          "kind": "p",
+          "name": "pastor_applications_pkey",
+          "definition": "PRIMARY KEY (profile_id)"
+        },
+        {
+          "kind": "c",
+          "name": "pastor_applications_verification_notes_check",
+          "definition": "CHECK (((verification_notes IS NULL) OR (char_length(btrim(verification_notes)) <= 500)))"
+        }
+      ]
+    },
+    {
+      "table": "auth_login_rate_limits",
+      "columns": [
+        {
+          "udt": "text",
+          "name": "bucket_key",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "int4",
+          "name": "attempt_count",
+          "type": "integer",
+          "default": "0",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "window_started_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "blocked_until",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "auth_login_rate_limits_attempt_count_check",
+          "definition": "CHECK ((attempt_count >= 0))"
+        },
+        {
+          "kind": "c",
+          "name": "auth_login_rate_limits_bucket_length",
+          "definition": "CHECK (((char_length(bucket_key) >= 1) AND (char_length(bucket_key) <= 200)))"
+        },
+        {
+          "kind": "p",
+          "name": "auth_login_rate_limits_pkey",
+          "definition": "PRIMARY KEY (bucket_key)"
+        }
+      ]
+    },
+    {
+      "table": "keepalive",
+      "columns": [
+        {
+          "udt": "int2",
+          "name": "id",
+          "type": "smallint",
+          "default": null,
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        },
+        {
+          "udt": "timestamptz",
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "NO",
+          "generated": "NEVER",
+          "generation": null
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "p",
+          "name": "keepalive_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "kind": "c",
+          "name": "keepalive_single_row",
+          "definition": "CHECK ((id = 1))"
+        }
+      ]
+    }
+  ],
+  "enums": [
+    {
+      "name": "legacy_app_role",
+      "labels": [
+        "admin",
+        "pastor",
+        "usher",
+        "member"
+      ]
+    },
+    {
+      "name": "app_role",
+      "labels": [
+        "administrator",
+        "usher",
+        "auditor",
+        "pastor"
+      ]
+    },
+    {
+      "name": "retention_action_type",
+      "labels": [
+        "contact_purged",
+        "visitor_anonymized",
+        "attendance_deleted",
+        "manual_deletion"
+      ]
+    }
+  ],
+  "indexes": [
+    {
+      "name": "profiles_pkey",
+      "table": "legacy_profiles",
+      "definition": "CREATE UNIQUE INDEX profiles_pkey ON public.legacy_profiles USING btree (id)"
+    },
+    {
+      "name": "profiles_email_key",
+      "table": "legacy_profiles",
+      "definition": "CREATE UNIQUE INDEX profiles_email_key ON public.legacy_profiles USING btree (email)"
+    },
+    {
+      "name": "people_pkey",
+      "table": "legacy_people",
+      "definition": "CREATE UNIQUE INDEX people_pkey ON public.legacy_people USING btree (id)"
+    },
+    {
+      "name": "idx_people_name",
+      "table": "legacy_people",
+      "definition": "CREATE INDEX idx_people_name ON public.legacy_people USING btree (last_name, first_name)"
+    },
+    {
+      "name": "idx_people_type",
+      "table": "legacy_people",
+      "definition": "CREATE INDEX idx_people_type ON public.legacy_people USING btree (person_type)"
+    },
+    {
+      "name": "idx_people_email",
+      "table": "legacy_people",
+      "definition": "CREATE INDEX idx_people_email ON public.legacy_people USING btree (email)"
+    },
+    {
+      "name": "services_pkey",
+      "table": "legacy_services",
+      "definition": "CREATE UNIQUE INDEX services_pkey ON public.legacy_services USING btree (id)"
+    },
+    {
+      "name": "services_title_service_date_start_time_key",
+      "table": "legacy_services",
+      "definition": "CREATE UNIQUE INDEX services_title_service_date_start_time_key ON public.legacy_services USING btree (title, service_date, start_time)"
+    },
+    {
+      "name": "attendance_records_pkey",
+      "table": "legacy_attendance_records",
+      "definition": "CREATE UNIQUE INDEX attendance_records_pkey ON public.legacy_attendance_records USING btree (id)"
+    },
+    {
+      "name": "attendance_records_service_id_person_id_key",
+      "table": "legacy_attendance_records",
+      "definition": "CREATE UNIQUE INDEX attendance_records_service_id_person_id_key ON public.legacy_attendance_records USING btree (service_id, person_id)"
+    },
+    {
+      "name": "idx_attendance_service",
+      "table": "legacy_attendance_records",
+      "definition": "CREATE INDEX idx_attendance_service ON public.legacy_attendance_records USING btree (service_id)"
+    },
+    {
+      "name": "idx_attendance_person",
+      "table": "legacy_attendance_records",
+      "definition": "CREATE INDEX idx_attendance_person ON public.legacy_attendance_records USING btree (person_id)"
+    },
+    {
+      "name": "idx_attendance_status",
+      "table": "legacy_attendance_records",
+      "definition": "CREATE INDEX idx_attendance_status ON public.legacy_attendance_records USING btree (status)"
+    },
+    {
+      "name": "follow_ups_pkey",
+      "table": "legacy_follow_ups",
+      "definition": "CREATE UNIQUE INDEX follow_ups_pkey ON public.legacy_follow_ups USING btree (id)"
+    },
+    {
+      "name": "idx_followups_person",
+      "table": "legacy_follow_ups",
+      "definition": "CREATE INDEX idx_followups_person ON public.legacy_follow_ups USING btree (person_id)"
+    },
+    {
+      "name": "idx_followups_assigned_to",
+      "table": "legacy_follow_ups",
+      "definition": "CREATE INDEX idx_followups_assigned_to ON public.legacy_follow_ups USING btree (assigned_to)"
+    },
+    {
+      "name": "idx_followups_status",
+      "table": "legacy_follow_ups",
+      "definition": "CREATE INDEX idx_followups_status ON public.legacy_follow_ups USING btree (status)"
+    },
+    {
+      "name": "audit_logs_pkey",
+      "table": "legacy_audit_logs",
+      "definition": "CREATE UNIQUE INDEX audit_logs_pkey ON public.legacy_audit_logs USING btree (id)"
+    },
+    {
+      "name": "idx_audit_logs_actor",
+      "table": "legacy_audit_logs",
+      "definition": "CREATE INDEX idx_audit_logs_actor ON public.legacy_audit_logs USING btree (actor_id)"
+    },
+    {
+      "name": "idx_audit_logs_entity",
+      "table": "legacy_audit_logs",
+      "definition": "CREATE INDEX idx_audit_logs_entity ON public.legacy_audit_logs USING btree (entity_type, entity_id)"
+    },
+    {
+      "name": "idx_audit_logs_created_at",
+      "table": "legacy_audit_logs",
+      "definition": "CREATE INDEX idx_audit_logs_created_at ON public.legacy_audit_logs USING btree (created_at DESC)"
+    },
+    {
+      "name": "organizations_pkey",
+      "table": "organizations",
+      "definition": "CREATE UNIQUE INDEX organizations_pkey ON public.organizations USING btree (id)"
+    },
+    {
+      "name": "organization_settings_pkey",
+      "table": "organization_settings",
+      "definition": "CREATE UNIQUE INDEX organization_settings_pkey ON public.organization_settings USING btree (organization_id)"
+    },
+    {
+      "name": "services_pkey1",
+      "table": "services",
+      "definition": "CREATE UNIQUE INDEX services_pkey1 ON public.services USING btree (id)"
+    },
+    {
+      "name": "services_organization_id_service_name_service_date_start_ti_key",
+      "table": "services",
+      "definition": "CREATE UNIQUE INDEX services_organization_id_service_name_service_date_start_ti_key ON public.services USING btree (organization_id, service_name, service_date, start_time)"
+    },
+    {
+      "name": "services_org_id_unique",
+      "table": "services",
+      "definition": "CREATE UNIQUE INDEX services_org_id_unique ON public.services USING btree (organization_id, id)"
+    },
+    {
+      "name": "services_org_date_idx",
+      "table": "services",
+      "definition": "CREATE INDEX services_org_date_idx ON public.services USING btree (organization_id, service_date DESC, start_time)"
+    },
+    {
+      "name": "service_assignments_pkey",
+      "table": "service_assignments",
+      "definition": "CREATE UNIQUE INDEX service_assignments_pkey ON public.service_assignments USING btree (service_id, user_id)"
+    },
+    {
+      "name": "service_assignments_user_idx",
+      "table": "service_assignments",
+      "definition": "CREATE INDEX service_assignments_user_idx ON public.service_assignments USING btree (organization_id, user_id, service_id)"
+    },
+    {
+      "name": "attendance_pkey",
+      "table": "attendance",
+      "definition": "CREATE UNIQUE INDEX attendance_pkey ON public.attendance USING btree (id)"
+    },
+    {
+      "name": "attendance_single_checkin",
+      "table": "attendance",
+      "definition": "CREATE UNIQUE INDEX attendance_single_checkin ON public.attendance USING btree (organization_id, visitor_id, service_id)"
+    },
+    {
+      "name": "attendance_service_active_idx",
+      "table": "attendance",
+      "definition": "CREATE INDEX attendance_service_active_idx ON public.attendance USING btree (organization_id, service_id, checked_in_at) WHERE (voided_at IS NULL)"
+    },
+    {
+      "name": "attendance_visitor_idx",
+      "table": "attendance",
+      "definition": "CREATE INDEX attendance_visitor_idx ON public.attendance USING btree (organization_id, visitor_id, checked_in_at DESC)"
+    },
+    {
+      "name": "audit_logs_pkey1",
+      "table": "audit_logs",
+      "definition": "CREATE UNIQUE INDEX audit_logs_pkey1 ON public.audit_logs USING btree (id)"
+    },
+    {
+      "name": "audit_logs_org_time_idx",
+      "table": "audit_logs",
+      "definition": "CREATE INDEX audit_logs_org_time_idx ON public.audit_logs USING btree (organization_id, event_timestamp DESC)"
+    },
+    {
+      "name": "retention_actions_pkey",
+      "table": "retention_actions",
+      "definition": "CREATE UNIQUE INDEX retention_actions_pkey ON public.retention_actions USING btree (id)"
+    },
+    {
+      "name": "retention_actions_org_time_idx",
+      "table": "retention_actions",
+      "definition": "CREATE INDEX retention_actions_org_time_idx ON public.retention_actions USING btree (organization_id, performed_at DESC)"
+    },
+    {
+      "name": "admin_signup_notifications_pkey",
+      "table": "admin_signup_notifications",
+      "definition": "CREATE UNIQUE INDEX admin_signup_notifications_pkey ON public.admin_signup_notifications USING btree (user_id)"
+    },
+    {
+      "name": "attendance_sessions_pkey",
+      "table": "attendance_sessions",
+      "definition": "CREATE UNIQUE INDEX attendance_sessions_pkey ON public.attendance_sessions USING btree (id)"
+    },
+    {
+      "name": "attendance_sessions_org_date_idx",
+      "table": "attendance_sessions",
+      "definition": "CREATE INDEX attendance_sessions_org_date_idx ON public.attendance_sessions USING btree (organization_id, service_date DESC)"
+    },
+    {
+      "name": "attendance_sessions_org_created_by_idx",
+      "table": "attendance_sessions",
+      "definition": "CREATE INDEX attendance_sessions_org_created_by_idx ON public.attendance_sessions USING btree (organization_id, created_by)"
+    },
+    {
+      "name": "user_profiles_pkey",
+      "table": "user_profiles",
+      "definition": "CREATE UNIQUE INDEX user_profiles_pkey ON public.user_profiles USING btree (id)"
+    },
+    {
+      "name": "user_profiles_org_id_unique",
+      "table": "user_profiles",
+      "definition": "CREATE UNIQUE INDEX user_profiles_org_id_unique ON public.user_profiles USING btree (organization_id, id)"
+    },
+    {
+      "name": "user_profiles_org_role_idx",
+      "table": "user_profiles",
+      "definition": "CREATE INDEX user_profiles_org_role_idx ON public.user_profiles USING btree (organization_id, role, active)"
+    },
+    {
+      "name": "user_profiles_clerk_user_id_key",
+      "table": "user_profiles",
+      "definition": "CREATE UNIQUE INDEX user_profiles_clerk_user_id_key ON public.user_profiles USING btree (clerk_user_id) WHERE (clerk_user_id IS NOT NULL)"
+    },
+    {
+      "name": "visitors_pkey",
+      "table": "visitors",
+      "definition": "CREATE UNIQUE INDEX visitors_pkey ON public.visitors USING btree (id)"
+    },
+    {
+      "name": "visitors_org_id_unique",
+      "table": "visitors",
+      "definition": "CREATE UNIQUE INDEX visitors_org_id_unique ON public.visitors USING btree (organization_id, id)"
+    },
+    {
+      "name": "visitors_org_name_idx",
+      "table": "visitors",
+      "definition": "CREATE INDEX visitors_org_name_idx ON public.visitors USING btree (organization_id, lower(full_name)) WHERE (active = true)"
+    },
+    {
+      "name": "visitors_org_first_visit_idx",
+      "table": "visitors",
+      "definition": "CREATE INDEX visitors_org_first_visit_idx ON public.visitors USING btree (organization_id, first_visit_date)"
+    },
+    {
+      "name": "visitors_org_created_by_idx",
+      "table": "visitors",
+      "definition": "CREATE INDEX visitors_org_created_by_idx ON public.visitors USING btree (organization_id, created_by)"
+    },
+    {
+      "name": "visitors_active_directory_idx",
+      "table": "visitors",
+      "definition": "CREATE INDEX visitors_active_directory_idx ON public.visitors USING btree (organization_id, created_at DESC, id DESC) WHERE (active = true)"
+    },
+    {
+      "name": "pastor_applications_pkey",
+      "table": "pastor_applications",
+      "definition": "CREATE UNIQUE INDEX pastor_applications_pkey ON public.pastor_applications USING btree (profile_id)"
+    },
+    {
+      "name": "pastor_applications_org_time_idx",
+      "table": "pastor_applications",
+      "definition": "CREATE INDEX pastor_applications_org_time_idx ON public.pastor_applications USING btree (organization_id, submitted_at DESC)"
+    },
+    {
+      "name": "auth_login_rate_limits_pkey",
+      "table": "auth_login_rate_limits",
+      "definition": "CREATE UNIQUE INDEX auth_login_rate_limits_pkey ON public.auth_login_rate_limits USING btree (bucket_key)"
+    },
+    {
+      "name": "auth_login_rate_limits_updated_at_idx",
+      "table": "auth_login_rate_limits",
+      "definition": "CREATE INDEX auth_login_rate_limits_updated_at_idx ON public.auth_login_rate_limits USING btree (updated_at)"
+    },
+    {
+      "name": "care_notes_pkey",
+      "table": "care_notes",
+      "definition": "CREATE UNIQUE INDEX care_notes_pkey ON public.care_notes USING btree (id)"
+    },
+    {
+      "name": "care_notes_visitor_idx",
+      "table": "care_notes",
+      "definition": "CREATE INDEX care_notes_visitor_idx ON public.care_notes USING btree (visitor_id, created_at DESC) WHERE (visitor_id IS NOT NULL)"
+    },
+    {
+      "name": "care_notes_member_idx",
+      "table": "care_notes",
+      "definition": "CREATE INDEX care_notes_member_idx ON public.care_notes USING btree (member_id, created_at DESC) WHERE (member_id IS NOT NULL)"
+    },
+    {
+      "name": "care_notes_org_person_idx",
+      "table": "care_notes",
+      "definition": "CREATE INDEX care_notes_org_person_idx ON public.care_notes USING btree (organization_id, visitor_id, member_id, created_at DESC)"
+    },
+    {
+      "name": "care_notes_org_status_idx",
+      "table": "care_notes",
+      "definition": "CREATE INDEX care_notes_org_status_idx ON public.care_notes USING btree (organization_id, status, created_at DESC)"
+    },
+    {
+      "name": "care_notes_org_created_by_idx",
+      "table": "care_notes",
+      "definition": "CREATE INDEX care_notes_org_created_by_idx ON public.care_notes USING btree (organization_id, created_by)"
+    },
+    {
+      "name": "care_notes_org_member_fk_idx",
+      "table": "care_notes",
+      "definition": "CREATE INDEX care_notes_org_member_fk_idx ON public.care_notes USING btree (organization_id, member_id) WHERE (member_id IS NOT NULL)"
+    },
+    {
+      "name": "visit_records_pkey",
+      "table": "visit_records",
+      "definition": "CREATE UNIQUE INDEX visit_records_pkey ON public.visit_records USING btree (id)"
+    },
+    {
+      "name": "visit_records_visitor_idx",
+      "table": "visit_records",
+      "definition": "CREATE INDEX visit_records_visitor_idx ON public.visit_records USING btree (visitor_id, visited_at DESC) WHERE (visitor_id IS NOT NULL)"
+    },
+    {
+      "name": "visit_records_member_idx",
+      "table": "visit_records",
+      "definition": "CREATE INDEX visit_records_member_idx ON public.visit_records USING btree (member_id, visited_at DESC) WHERE (member_id IS NOT NULL)"
+    },
+    {
+      "name": "visit_records_org_person_idx",
+      "table": "visit_records",
+      "definition": "CREATE INDEX visit_records_org_person_idx ON public.visit_records USING btree (organization_id, visitor_id, member_id, visited_at DESC)"
+    },
+    {
+      "name": "visit_records_org_visited_by_idx",
+      "table": "visit_records",
+      "definition": "CREATE INDEX visit_records_org_visited_by_idx ON public.visit_records USING btree (organization_id, visited_by)"
+    },
+    {
+      "name": "visit_records_org_member_fk_idx",
+      "table": "visit_records",
+      "definition": "CREATE INDEX visit_records_org_member_fk_idx ON public.visit_records USING btree (organization_id, member_id) WHERE (member_id IS NOT NULL)"
+    },
+    {
+      "name": "members_pkey",
+      "table": "members",
+      "definition": "CREATE UNIQUE INDEX members_pkey ON public.members USING btree (id)"
+    },
+    {
+      "name": "members_org_id_id_uidx",
+      "table": "members",
+      "definition": "CREATE UNIQUE INDEX members_org_id_id_uidx ON public.members USING btree (organization_id, id)"
+    },
+    {
+      "name": "members_org_name_idx",
+      "table": "members",
+      "definition": "CREATE INDEX members_org_name_idx ON public.members USING btree (organization_id, lower(last_name), lower(first_name)) WHERE (active = true)"
+    },
+    {
+      "name": "members_org_created_by_idx",
+      "table": "members",
+      "definition": "CREATE INDEX members_org_created_by_idx ON public.members USING btree (organization_id, created_by)"
+    },
+    {
+      "name": "members_org_active_birth_date_idx",
+      "table": "members",
+      "definition": "CREATE INDEX members_org_active_birth_date_idx ON public.members USING btree (organization_id, birth_date) WHERE ((active = true) AND (birth_date IS NOT NULL))"
+    },
+    {
+      "name": "members_active_directory_idx",
+      "table": "members",
+      "definition": "CREATE INDEX members_active_directory_idx ON public.members USING btree (organization_id, created_at DESC, id DESC) WHERE (active = true)"
+    },
+    {
+      "name": "keepalive_pkey",
+      "table": "keepalive",
+      "definition": "CREATE UNIQUE INDEX keepalive_pkey ON public.keepalive USING btree (id)"
+    }
+  ],
+  "exported_at": "2026-10-05T20:34:07.580Z"
+}

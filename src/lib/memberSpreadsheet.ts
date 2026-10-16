@@ -119,8 +119,24 @@ async function inflateEntry(buffer: ArrayBuffer, entry: ZipEntry): Promise<Uint8
   }
 
   const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
-  const inflated = new Uint8Array(await new Response(stream).arrayBuffer());
-  if (inflated.byteLength > MAX_ZIP_ENTRY_BYTES) throw new Error('The Excel worksheet is too large.');
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_ZIP_ENTRY_BYTES) {
+        await reader.cancel().catch(() => {});
+        throw new Error('The Excel worksheet is too large.');
+      }
+      chunks.push(value);
+    }
+  } finally { reader.releaseLock(); }
+  const inflated = new Uint8Array(size);
+  let position = 0;
+  for (const chunk of chunks) { inflated.set(chunk, position); position += chunk.byteLength; }
   return inflated;
 }
 

@@ -38,3 +38,6 @@ jobs:
 
       - name: Verify production build
         run: npm run build
+
+      - name: Verify authentication and data security boundaries
+        run: npm run test:cloudflare

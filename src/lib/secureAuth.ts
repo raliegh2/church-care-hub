@@ -1,104 +1,11 @@
-import { supabase, supabasePublishableKey, supabaseUrl } from './supabase';
-import { createReliableFetch } from './reliableFetch';
-const boundedFetch = createReliableFetch();
-
-interface SecureLoginResponse {
-  access_token?: string;
-  refresh_token?: string;
-  retry_after_seconds?: number;
-  error?: string;
-}
+import { backend } from './backend';
 
 export class SecureLoginError extends Error {
-  readonly retryAfterSeconds: number;
-  /** HTTP status from the sign-in service; 0 when it could not be reached. */
-  readonly status: number;
-
-  constructor(message: string, retryAfterSeconds = 0, status = 0) {
-    super(message);
-    this.name = 'SecureLoginError';
-    this.retryAfterSeconds = retryAfterSeconds;
-    this.status = status;
+  constructor(message: string, readonly retryAfterSeconds = 0, readonly status = 0) {
+    super(message); this.name = 'SecureLoginError';
   }
 }
-
 export async function secureSignIn(email: string, password: string): Promise<void> {
-  const headers: Record<string, string> = {
-    apikey: supabasePublishableKey,
-    'Content-Type': 'application/json',
-  };
-
-  // Legacy anon keys are JWTs and can be sent as a bearer token. Modern
-  // publishable keys must only be sent through the apikey header.
-  if (!supabasePublishableKey.startsWith('sb_publishable_')) {
-    headers.Authorization = `Bearer ${supabasePublishableKey}`;
-  }
-
-  let response: Response;
-  try {
-    response = await boundedFetch(`${supabaseUrl}/functions/v1/secure-login`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ email, password }),
-      cache: 'no-store',
-      credentials: 'omit',
-    });
-  } catch {
-    throw new SecureLoginError('Unable to reach the secure login service. Please try again.');
-  }
-
-  const payload = (await response.json().catch(() => ({}))) as SecureLoginResponse;
-  const retryAfterSeconds = Math.max(
-    0,
-    Number(payload.retry_after_seconds || response.headers.get('Retry-After') || 0),
-  );
-
-  if (!response.ok || !payload.access_token || !payload.refresh_token) {
-    const message = response.status === 429
-      ? 'Too many sign-in attempts. Please wait before trying again.'
-      : response.status === 401
-        ? 'The email or password is incorrect.'
-        : 'Sign-in is temporarily unavailable. Please try again.';
-    throw new SecureLoginError(message, retryAfterSeconds, response.status);
-  }
-
-  const { error } = await supabase.auth.setSession({
-    access_token: payload.access_token,
-    refresh_token: payload.refresh_token,
-  });
-
-  if (error) {
-    throw new SecureLoginError('The secure session could not be established. Please sign in again.');
-  }
-}
-
-/**
- * Clear login throttles while the password-recovery session is still valid.
- * Supabase terminates the current session when the password changes, so this
- * must run before updateUser({ password }). Best-effort: a cleanup failure must
- * never prevent the user from setting a new password.
- */
-export async function clearLoginThrottleForPasswordReset(): Promise<boolean> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  if (!token) return false;
-
-  const headers: Record<string, string> = {
-    apikey: supabasePublishableKey,
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
-  };
-
-  try {
-    const response = await boundedFetch(`${supabaseUrl}/functions/v1/secure-login`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ action: 'reset_complete' }),
-      cache: 'no-store',
-      credentials: 'omit',
-    });
-    return response.ok;
-  } catch {
-    return false;
-  }
+  const { data, error } = await backend.auth.signIn(email, password);
+  if (error) throw new SecureLoginError(error.message, Number(data?.retry_after_seconds || 0), error.status || 0);
 }

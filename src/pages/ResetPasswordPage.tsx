@@ -1,8 +1,7 @@
 import { useState, type FormEvent } from 'react';
-import type { AuthError } from '@supabase/supabase-js';
+import type { AuthError } from '../lib/backend';
 import { Brand } from '../components/Brand';
-import { supabase } from '../lib/supabase';
-import { clearLoginThrottleForPasswordReset } from '../lib/secureAuth';
+import { backend } from '../lib/backend';
 import {
   isPasswordPolicyError,
   meetsPasswordPolicy,
@@ -49,9 +48,8 @@ export function ResetPasswordPage({
     // Supabase terminates the recovery session when the password changes. Clear
     // the login throttle first, while the recovery token can still be verified,
     // so the sign-in that follows is not turned away by an earlier lockout.
-    await clearLoginThrottleForPasswordReset();
 
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error } = await backend.auth.updateUser({ password });
     if (error) {
       setBusy(false);
       if (recoverySessionExpired(error)) {

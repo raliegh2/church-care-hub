@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ContactRound, HeartHandshake, LockKeyhole, ShieldCheck } from 'lucide-react';
 import { Brand } from '../components/Brand';
-import { supabase } from '../lib/supabase';
+import { backend } from '../lib/backend';
 
 export function OnboardingPage({ defaultName, onDone }: { defaultName: string; onDone: () => void }) {
   const [role, setRole] = useState<'usher' | 'pastor' | null>(null);
@@ -21,7 +21,7 @@ export function OnboardingPage({ defaultName, onDone }: { defaultName: string; o
 
     setBusy(true);
     setError('');
-    const { error: saveError } = await supabase.rpc('complete_onboarding', {
+    const { error: saveError } = await backend.rpc('complete_onboarding', {
       p_display_name: name.trim(),
       p_requested_role: role,
     });
