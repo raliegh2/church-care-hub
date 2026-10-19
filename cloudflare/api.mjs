@@ -1,3 +1,4 @@
+import { securityBoundary } from './security-boundary.mjs';
 import catalog from './source-catalog.json' with { type: 'json' };
 import { handleSecureLogin } from './secure-login.mjs';
 import { getAuth, handleAuth } from './auth.mjs';
@@ -222,7 +223,7 @@ async function rpc(request, env, actor) {
   throw error('Unknown account action', 404);
 }
 
-export default {
+const application = {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname.endsWith('.map')) return new Response('Not found', { status: 404, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
@@ -246,3 +247,5 @@ export default {
     }
   }
 };
+
+export default { fetch: securityBoundary('church-care-hub', (...args) => application.fetch(...args)) };
